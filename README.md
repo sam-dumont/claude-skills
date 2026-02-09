@@ -7,6 +7,7 @@ A collection of custom [Claude Code](https://docs.anthropic.com/en/docs/claude-c
 | Skill | Description |
 |-------|-------------|
 | [sams-voice.md](./sams-voice.md) | Apply Sam Dumont's personal writing voice and style when drafting any written content. Works in English and French. |
+| [sams-architecture.md](./sams-architecture.md) | Codifies Sam's mature architectural patterns for Python APIs, infrastructure/DevOps, Garmin/embedded systems, and frontend projects. Automatically triggers during project planning, architecture reviews, and codebase audits. Enforces Service→Repository→Database pattern, 80% test coverage, comprehensive CI/CD, and zero-tolerance security standards for personal projects. Adapts recommendations for client work. |
 
 ## Installation
 
