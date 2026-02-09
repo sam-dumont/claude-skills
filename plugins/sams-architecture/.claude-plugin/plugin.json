@@ -1,0 +1,13 @@
+{
+  "name": "sams-architecture",
+  "version": "1.0.0",
+  "description": "Codifies Sam's mature architectural patterns for Python APIs, infrastructure/DevOps, Garmin/embedded systems, and frontend projects. Enforces Service→Repository→Database pattern, 80% test coverage, comprehensive CI/CD, and zero-tolerance security standards.",
+  "author": {
+    "name": "Sam Dumont",
+    "email": "sam@dropbars.be"
+  },
+  "homepage": "https://github.com/sam-dumont/claude-skills",
+  "repository": "https://github.com/sam-dumont/claude-skills",
+  "license": "MIT",
+  "keywords": ["architecture", "python", "fastapi", "devops", "embedded", "security", "testing", "ci-cd", "terraform", "kubernetes", "garmin"]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "sams-voice",
+  "version": "1.0.0",
+  "description": "Apply Sam Dumont's personal writing voice and style when drafting any written content. Works in English and French.",
+  "author": {
+    "name": "Sam Dumont",
+    "email": "sam@dropbars.be"
+  },
+  "homepage": "https://github.com/sam-dumont/claude-skills",
+  "repository": "https://github.com/sam-dumont/claude-skills",
+  "license": "MIT",
+  "keywords": ["writing", "style", "voice", "communication", "french", "english"]
+}
