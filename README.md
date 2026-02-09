@@ -1,60 +1,184 @@
-# claude-skills
+# Sam's Claude Skills
 
-A collection of custom [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills.
+A marketplace collection of custom [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills.
 
 ## Available Skills
 
-| Skill | Description |
-|-------|-------------|
-| [sams-voice.md](./sams-voice.md) | Apply Sam Dumont's personal writing voice and style when drafting any written content. Works in English and French. |
-| [sams-architecture.md](./sams-architecture.md) | Codifies Sam's mature architectural patterns for Python APIs, infrastructure/DevOps, Garmin/embedded systems, and frontend projects. Automatically triggers during project planning, architecture reviews, and codebase audits. Enforces Service→Repository→Database pattern, 80% test coverage, comprehensive CI/CD, and zero-tolerance security standards for personal projects. Adapts recommendations for client work. |
+| Skill | Description | Tags |
+|-------|-------------|------|
+| **sams-voice** | Apply Sam Dumont's personal writing voice and style when drafting any written content. Works in English and French. | writing, style, voice, communication |
+| **sams-architecture** | Codifies Sam's mature architectural patterns for Python APIs, infrastructure/DevOps, Garmin/embedded systems, and frontend projects. Enforces Service→Repository→Database pattern, 80% test coverage, comprehensive CI/CD, and zero-tolerance security standards. | architecture, python, devops, embedded, security, testing |
 
 ## Installation
 
-Claude Code skills are Markdown files with YAML frontmatter that live in your `~/.claude/skills/` directory.
-
-### Install a single skill
+Install skills directly from this GitHub repository using Claude Code's marketplace system:
 
 ```bash
-# Create the skills directory if it doesn't exist
-mkdir -p ~/.claude/skills
+# Add this marketplace to Claude Code
+/plugin marketplace add sam-dumont/claude-skills
 
-# Copy the skill file
+# Install specific skills
+/plugin install sams-voice@sams-skills
+/plugin install sams-architecture@sams-skills
+```
+
+**That's it!** Skills are now available and auto-trigger when Claude detects matching prompts.
+
+### Update Skills
+
+```bash
+# Update the marketplace to get latest versions
+/plugin marketplace update sams-skills
+```
+
+### Remove Skills
+
+```bash
+# Remove a specific skill
+/plugin uninstall sams-voice@sams-skills
+
+# Remove the entire marketplace
+/plugin marketplace remove sams-skills
+```
+
+## For Teams: Auto-Install Skills
+
+Add to your project's `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "sams-skills": {
+      "source": {
+        "source": "github",
+        "repo": "sam-dumont/claude-skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "sams-voice@sams-skills": true,
+    "sams-architecture@sams-skills": true
+  }
+}
+```
+
+Now all team members automatically get these skills when they open the project!
+
+## Skill Descriptions
+
+### sams-voice
+
+Automatically triggered when drafting written content like:
+- Blog posts and articles
+- Email communications
+- Slack/Discord messages
+- Documentation
+- Social media posts
+- Comments and reviews
+
+Applies Sam's voice characteristics:
+- Direct, conversational French-Canadian English
+- Technical precision without jargon
+- Authentic personality (humor, strong opinions)
+- Code-first examples
+- Bilingual support (English/French)
+
+### sams-architecture
+
+Automatically triggered when:
+- Planning new projects
+- Designing system architecture
+- Conducting architecture reviews
+- Making technology choices
+- Setting up CI/CD pipelines
+- Auditing existing codebases
+
+Enforces patterns:
+- Python APIs: FastAPI + Service→Repository→Database
+- Testing: 80% minimum coverage
+- Security: Zero-tolerance (auth, validation, scanning)
+- CI/CD: Comprehensive automation
+- Embedded: Memory optimization for Garmin/MonkeyC
+- Infrastructure: Terraform + Kubernetes
+- Documentation: CLAUDE.md + README + ADRs
+
+## Repository Structure
+
+\`\`\`
+claude-skills/
+├── .claude-plugin/
+│   └── marketplace.json          # Marketplace manifest
+├── plugins/
+│   ├── sams-voice/
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json       # Plugin metadata
+│   │   └── skills/
+│   │       └── sams-voice/
+│   │           └── SKILL.md      # Skill definition
+│   └── sams-architecture/
+│       ├── .claude-plugin/
+│       │   └── plugin.json
+│       └── skills/
+│           └── sams-architecture/
+│               └── SKILL.md
+├── sams-voice.md                 # Direct skill file (backward compatible)
+├── sams-architecture.md          # Direct skill file (backward compatible)
+└── README.md
+\`\`\`
+
+## Manual Installation (Alternative)
+
+If you prefer direct file copying to \`~/.claude/skills/\`:
+
+\`\`\`bash
+mkdir -p ~/.claude/skills
 cp sams-voice.md ~/.claude/skills/
-```
+cp sams-architecture.md ~/.claude/skills/
+\`\`\`
 
-### Install all skills from this repo
+## Adding New Skills
 
-```bash
-mkdir -p ~/.claude/skills
-cp *.md ~/.claude/skills/
-```
+1. Create plugin structure:
+\`\`\`bash
+mkdir -p plugins/my-skill/{.claude-plugin,skills/my-skill}
+\`\`\`
 
-> **Note:** This copies `README.md` too, which is harmless - Claude Code only triggers skills that have valid YAML frontmatter with a `name` and `description`.
+2. Create plugin manifest (\`plugins/my-skill/.claude-plugin/plugin.json\`):
+\`\`\`json
+{
+  "name": "my-skill",
+  "version": "1.0.0",
+  "description": "What this skill does",
+  "author": { "name": "Your Name" },
+  "keywords": ["relevant", "tags"]
+}
+\`\`\`
 
-### Verify installation
-
-```bash
-ls ~/.claude/skills/
-```
-
-Once installed, the skill activates automatically when Claude Code detects a matching prompt (e.g. "write a blog post in my voice", "draft a Slack message for me").
-
-## Writing Your Own Skills
-
-A skill is a Markdown file with YAML frontmatter:
-
-```yaml
+3. Create skill file (\`plugins/my-skill/skills/my-skill/SKILL.md\`):
+\`\`\`yaml
 ---
 name: my-skill
 description: >
-  When to trigger this skill. Claude uses this text to decide
-  if the skill is relevant to the current prompt.
+  When this skill should trigger
 ---
 
-# Skill Title
+# Skill instructions here
+\`\`\`
 
-Instructions for Claude go here...
-```
+4. Add to marketplace manifest (\`.claude-plugin/marketplace.json\`)
 
-Drop the file into `~/.claude/skills/` and it's ready to use.
+5. Test locally:
+\`\`\`bash
+/plugin marketplace add ./
+/plugin install my-skill@sams-skills
+\`\`\`
+
+## License
+
+MIT
+
+## Author
+
+**Sam Dumont**
+- GitHub: [@sam-dumont](https://github.com/sam-dumont)
+- Website: [dropbars.be](https://dropbars.be)
