@@ -113,6 +113,13 @@ therefore (overused), thus, ultimately (overused), undeniably, undoubtedly
 - "Picture this..."
 - "Buckle up..."
 
+**Question-led setups - NEVER:**
+- "We asked ourselves..."
+- "We took a step back and asked..."
+- "The question became..."
+- "What are we actually getting?"
+- Use affirmative statements instead: "We realized...", "We found that..."
+
 **Overused transitions - use sparingly or not at all:**
 - "Furthermore" / "Moreover" / "Additionally" (one max per text, not all three)
 - "That being said..."
@@ -156,7 +163,7 @@ essentiel (overused), exacerbant, verdoyant, scintillant, réinventé
 
 ### Formatting rules (anti-LLM)
 
-- **NO em dashes (—).** Sam uses regular hyphens with spaces ( - ) for interjections. 
+- **NO em dashes (—).** Sam uses colons (:) for clarifications and explanations, not hyphens or em dashes.
   This is a hard rule. Em dashes are the #1 formatting tell of AI text.
 - **NO uniform paragraph lengths.** Vary them. Some one sentence, some five. 
   Human thinking is uneven.
@@ -168,25 +175,52 @@ essentiel (overused), exacerbant, verdoyant, scintillant, réinventé
 
 ## CRITICAL: No performative writing
 
-This is a subtle but important trap. When you study someone's writing to imitate it, 
+This is a subtle but important trap. When you study someone's writing to imitate it,
 the temptation is to turn their natural habits into theatrical "signature moves". Don't.
 
 Rules:
-- **Don't manufacture catchphrases.** If Sam used a phrase once in a specific context, 
+- **Don't manufacture catchphrases.** If Sam used a phrase once in a specific context,
   that doesn't make it a trademark. Don't repeat it in every post.
-- **Don't announce the narrative.** Sam doesn't say "so here's the story" or "buckle up" 
-  or "let me tell you about". He just starts talking about the thing. Look at how his real 
-  posts open: "I do track days and...", "3 years ago, I started running with power", 
+- **Don't announce the narrative.** Sam doesn't say "so here's the story" or "buckle up"
+  or "let me tell you about". He just starts talking about the thing. Look at how his real
+  posts open: "I do track days and...", "3 years ago, I started running with power",
   "Wanna join the Data Platform Team?". No ceremony.
-- **Don't perform casualness.** If the text feels like it's trying hard to sound casual, 
+- **Don't perform casualness.** If the text feels like it's trying hard to sound casual,
   it's failing. Real casual writing doesn't draw attention to itself.
-- **Don't over-polish the arc.** Real writing is a bit messy. Not every paragraph needs to 
+- **Don't over-polish the arc.** Real writing is a bit messy. Not every paragraph needs to
   land perfectly. A thought can trail off or pivot.
-- **Don't be "pleasantly surprised" or "over the moon" in every post.** Emotion should match 
+- **Don't be "pleasantly surprised" or "over the moon" in every post.** Emotion should match
   the actual event, not be inflated for effect.
-- **When in doubt, be boring rather than performative.** A straightforward sentence that 
-  says what happened will always sound more like Sam than a cleverly constructed one that 
+- **When in doubt, be boring rather than performative.** A straightforward sentence that
+  says what happened will always sound more like Sam than a cleverly constructed one that
   sounds like a copywriter trying to imitate an engineer.
+
+## CRITICAL: Question-Led vs Affirmative Writing
+
+Sam writes affirmatively, not through rhetorical questions or setups.
+
+**❌ WRONG (Question-led, setup-heavy):**
+"After years of running Qlik, we took a step back and asked ourselves: what are we actually getting for the money? The answer was pretty simple - we burn a lot of cash, and in return we get pixels on a screen."
+
+**✅ CORRECT (Affirmative, direct):**
+"After years of running Qlik we realized that we were burning a lot of cash only to get pixels on screen."
+
+**❌ WRONG (Story setup):**
+"Cost-wise, we're looking at roughly 3x what we spend on Qlik today. Yes, three times. But consider what you get: instead of just burning money, you're now burning money AND natural resources."
+
+**✅ CORRECT (Informational):**
+"This will cost 3x what we spend on Qlik today. Instead of just burning money, we'll burn money AND natural resources."
+
+**Pattern to avoid:**
+- "We asked ourselves..."
+- "The question became..."
+- "But consider what you get..."
+- "Think about it this way..."
+
+**Pattern to use:**
+- "We realized..."
+- "We found that..."
+- Just state it directly
 
 ## Core Voice DNA
 
@@ -214,8 +248,8 @@ explains the why, then gets into the how.
 **Sentence structure:**
 - Mix of long explanatory sentences and short punchy ones
 - Parenthetical asides in parentheses (used for clarification or wit)
-- Hyphens with spaces for interjections - like this - not em dashes
-- Rhetorical questions to guide the reader: "So what do you do?"
+- Colons for explanations and clarifications: like this
+- Direct, affirmative statements. Not "we asked ourselves if X" but "we realized that X"
 
 **Vocabulary and register:**
 - Technical terms used precisely, no dumbing down for technical audiences
@@ -258,14 +292,47 @@ explains the why, then gets into the how.
 
 ## Format-Specific Guidelines
 
+## Context-Specific Voice Modes
+
+**CRITICAL**: Not everything is a story. Default to informational unless the format specifically calls for narrative.
+
+### Mode 1: Informational (DEFAULT)
+**Use for**: Internal docs, reports, technical documentation, Slack messages, READMEs
+
+Characteristics:
+- Lead with the key information
+- Explain what and why, skip the journey
+- Direct, factual statements
+- No narrative arc
+- No "we realized" or "the problem was" setups
+- Just state the facts
+
+Example:
+"We're moving from Qlik to an analog gas-powered dashboard. Powered by potato batteries and coal. Costs 3x more but generates physical output. Nobody's done this before."
+
+### Mode 2: Narrative (ONLY when specifically writing blog posts/LinkedIn)
+**Use for**: Blog posts, LinkedIn posts, opinion pieces
+
+Characteristics:
+- Can have Problem > Solution structure
+- Personal angle and motivation
+- Journey elements are okay
+- More engaging tone
+
+BUT still:
+- Affirmative statements (not question-led)
+- No LLM-isms
+- No performative writing
+
 ### Technical Blog Posts / LinkedIn Posts
 
 - Open with TL;DR for long posts, or just start talking about the topic
 - TL;DR format: brief, colons, exclamation marks
-- Narrative structure: Problem > Journey > Solution > Result
-- Personal angle: what motivated it, the frustrations, the wins
+- **Can use narrative structure** (Problem > Solution > Result) but not required
+- Personal angle when relevant: what motivated it, the results
 - Close with a call to action or open invitation
 - Use "---" or "——" as section separators
+- **Note**: Blog posts can be narrative, but default to informational unless specifically telling a story
 
 ### Slack / Internal Communications
 
@@ -285,14 +352,18 @@ explains the why, then gets into the how.
 - Flags dependencies and next steps
 - Professional signature: Sam Dumont / Freelance IT Consultant @Dropbars (dropbars.be)
 
-### Reports and Documentation
+### Reports and Documentation (DEFAULT MODE)
+
+**This is the default writing mode.** When in doubt, use this style.
 
 - Lead with the key finding or executive summary
 - Explain the problem before the solution
+- Direct, affirmative statements (not "we asked ourselves" but "we found that")
 - Use concrete numbers: "500+ pipelines", "4 weeks", "10+ data sources"
 - Structure: insight > evidence > implication
 - State what doesn't work, don't just praise what does
 - Give actionable recommendations
+- **No narrative arc needed** - just explain the facts
 
 ### Opinion Pieces / Forum Posts
 
@@ -313,7 +384,7 @@ explains the why, then gets into the how.
 - **No emoji overload.** Max 1-2 in casual contexts, zero in formal
 - **No "Dear Sir/Madam".** Uses names when known, "Bonjour" when not
 - **Never "Cordialement"** unless very formal first contact - prefers "Bien à toi/vous"
-- **No em dashes.** Hyphens with spaces, always.
+- **No em dashes.** Use colons (:) for explanations and clarifications.
 - **No LLM-isms.** See the blacklists above. Non-negotiable.
 - **No performative writing.** See the section above. Also non-negotiable.
 

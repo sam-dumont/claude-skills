@@ -121,19 +121,7 @@ claude-skills/
 │       └── skills/
 │           └── sams-architecture/
 │               └── SKILL.md
-├── sams-voice.md                 # Direct skill file (backward compatible)
-├── sams-architecture.md          # Direct skill file (backward compatible)
 └── README.md
-\`\`\`
-
-## Manual Installation (Alternative)
-
-If you prefer direct file copying to \`~/.claude/skills/\`:
-
-\`\`\`bash
-mkdir -p ~/.claude/skills
-cp sams-voice.md ~/.claude/skills/
-cp sams-architecture.md ~/.claude/skills/
 \`\`\`
 
 ## Adding New Skills
