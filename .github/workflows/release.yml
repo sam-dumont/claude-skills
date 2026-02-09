@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Get commit messages since last tag
+        id: changelog
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREV_TAG" ]; then
+            # First release - get all commits
+            CHANGELOG=$(git log --pretty=format:"- %s" --no-merges)
+          else
+            # Get commits between previous tag and current
+            CHANGELOG=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s" --no-merges)
+          fi
+
+          # Save to output (handle multiline)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Claude Code Skills Marketplace Release
+
+            ### 📦 Available Skills
+            - **sams-voice**: Writing voice and style (English/French)
+            - **sams-architecture**: Architectural patterns (Python/DevOps/Embedded)
+
+            ### 🚀 Installation
+
+            ```bash
+            # Add marketplace
+            /plugin marketplace add sam-dumont/claude-skills
+
+            # Install skills
+            /plugin install sams-voice@sams-skills
+            /plugin install sams-architecture@sams-skills
+            ```
+
+            ### 📝 What's Changed
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ---
+
+            **Full Changelog**: https://github.com/sam-dumont/claude-skills/commits/${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
