@@ -13,3 +13,6 @@
 # Temporary files
 *.tmp
 *.bak
+
+# Private templates (not for public repo)
+plugins/sams-voice/templates/
