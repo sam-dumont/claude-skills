@@ -13,7 +13,7 @@
       "name": "sams-voice",
       "source": "./plugins/sams-voice",
       "description": "Apply Sam Dumont's personal writing voice and style when drafting any written content. Works in English and French.",
-      "version": "1.2.0",
+      "version": "1.1.0",
       "author": {
         "name": "Sam Dumont"
       },
