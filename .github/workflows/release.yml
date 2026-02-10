@@ -19,7 +19,32 @@ jobs:
 
       - name: Extract version from tag
         id: version
-        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Stamp version into all plugin manifests
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Update marketplace metadata version
+          jq --arg v "$VERSION" '.metadata.version = $v' .claude-plugin/marketplace.json > tmp.json && mv tmp.json .claude-plugin/marketplace.json
+
+          # Update all plugin versions in marketplace listing
+          jq --arg v "$VERSION" '.plugins[].version = $v' .claude-plugin/marketplace.json > tmp.json && mv tmp.json .claude-plugin/marketplace.json
+
+          # Update each plugin's own plugin.json
+          for f in plugins/*/. ; do
+            plugin_json="$f.claude-plugin/plugin.json"
+            if [ -f "$plugin_json" ]; then
+              jq --arg v "$VERSION" '.version = $v' "$plugin_json" > tmp.json && mv tmp.json "$plugin_json"
+              echo "Stamped $plugin_json -> $VERSION"
+            fi
+          done
+
+          echo "All manifests stamped to $VERSION"
 
       - name: Get commit messages since last tag
         id: changelog
@@ -43,15 +68,15 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: Release ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.tag }}
           body: |
             ## Claude Code Skills Marketplace Release
 
-            ### 📦 Available Skills
+            ### Available Skills
             - **sams-voice**: Writing voice and style (English/French)
             - **sams-architecture**: Architectural patterns (Python/DevOps/Embedded)
 
-            ### 🚀 Installation
+            ### Installation
 
             ```bash
             # Add marketplace
@@ -62,13 +87,13 @@ jobs:
             /plugin install sams-architecture@sams-skills
             ```
 
-            ### 📝 What's Changed
+            ### What's Changed
 
             ${{ steps.changelog.outputs.changelog }}
 
             ---
 
-            **Full Changelog**: https://github.com/sam-dumont/claude-skills/commits/${{ steps.version.outputs.version }}
+            **Full Changelog**: https://github.com/sam-dumont/claude-skills/commits/${{ steps.version.outputs.tag }}
           draft: false
           prerelease: false
           generate_release_notes: true
