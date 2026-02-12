@@ -85,6 +85,7 @@ jobs:
             ### Available Skills
             - **sams-voice**: Writing voice and style (English/French)
             - **sams-architecture**: Architectural patterns (Python/DevOps/Embedded)
+            - **outcome-engineering**: Outcome-first workflow framing (o16g)
 
             ### Installation
 
@@ -95,6 +96,7 @@ jobs:
             # Install skills
             /plugin install sams-voice@sams-skills
             /plugin install sams-architecture@sams-skills
+            /plugin install outcome-engineering@sams-skills
             ```
 
             ### What's Changed

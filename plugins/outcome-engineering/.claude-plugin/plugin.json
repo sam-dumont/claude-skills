@@ -1,0 +1,13 @@
+{
+  "name": "outcome-engineering",
+  "version": "1.0.0",
+  "description": "Reframes tasks as measurable outcomes using o16g principles. Adds outcome specification, execution guardrails, and validation to any workflow.",
+  "author": {
+    "name": "Sam Dumont",
+    "email": "sam@dropbars.be"
+  },
+  "homepage": "https://github.com/sam-dumont/claude-skills",
+  "repository": "https://github.com/sam-dumont/claude-skills",
+  "license": "MIT",
+  "keywords": ["outcome-engineering", "o16g", "outcomes", "verification", "decision-making", "workflow"]
+}

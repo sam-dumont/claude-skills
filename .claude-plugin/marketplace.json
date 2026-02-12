@@ -28,6 +28,16 @@
         "name": "Sam Dumont"
       },
       "keywords": ["architecture", "python", "fastapi", "devops", "embedded", "security", "testing", "ci-cd", "terraform", "kubernetes", "garmin"]
+    },
+    {
+      "name": "outcome-engineering",
+      "source": "./plugins/outcome-engineering",
+      "description": "Reframes tasks as measurable outcomes using o16g principles. Adds outcome specification, execution guardrails, and validation to any workflow.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Sam Dumont"
+      },
+      "keywords": ["outcome-engineering", "o16g", "outcomes", "verification", "decision-making", "workflow"]
     }
   ]
 }
