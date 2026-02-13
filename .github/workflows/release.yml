@@ -37,8 +37,8 @@ jobs:
           jq --arg v "$VERSION" '.plugins[].version = $v' .claude-plugin/marketplace.json > tmp.json && mv tmp.json .claude-plugin/marketplace.json
 
           # Update each plugin's own plugin.json
-          for f in plugins/*/. ; do
-            plugin_json="$f.claude-plugin/plugin.json"
+          for f in plugins/*; do
+            plugin_json="$f/.claude-plugin/plugin.json"
             if [ -f "$plugin_json" ]; then
               jq --arg v "$VERSION" '.version = $v' "$plugin_json" > tmp.json && mv tmp.json "$plugin_json"
               echo "Stamped $plugin_json -> $VERSION"
