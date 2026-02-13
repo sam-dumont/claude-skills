@@ -1,6 +1,6 @@
 {
   "name": "sams-architecture",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "description": "Codifies Sam's mature architectural patterns for Python APIs, infrastructure/DevOps, Garmin/embedded systems, and frontend projects. Enforces Service→Repository→Database pattern, 80% test coverage, comprehensive CI/CD, and zero-tolerance security standards.",
   "author": {
     "name": "Sam Dumont",
