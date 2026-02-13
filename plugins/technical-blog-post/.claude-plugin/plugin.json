@@ -1,6 +1,6 @@
 {
   "name": "technical-blog-post",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Process skill for turning raw project data (research notes, session logs, drafts, code) into structured technical blog posts. Covers gathering, extraction, structure, and Astro frontmatter.",
   "author": {
     "name": "Sam Dumont",
