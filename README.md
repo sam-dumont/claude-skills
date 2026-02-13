@@ -10,6 +10,7 @@ A marketplace collection of custom [Claude Code](https://docs.anthropic.com/en/d
 | **sams-architecture** | Codifies Sam's mature architectural patterns for Python APIs, infrastructure/DevOps, Garmin/embedded systems, and frontend projects. Enforces Service→Repository→Database pattern, 80% test coverage, comprehensive CI/CD, and zero-tolerance security standards. | architecture, python, devops, embedded, security, testing |
 | **outcome-engineering** | Reframes tasks as measurable outcomes using o16g principles. Adds outcome specification, execution guardrails, and validation to any workflow. | outcome-engineering, o16g, outcomes, verification |
 | **candidate-assessment** | Deep professional assessment combining CV analysis, OSINT research, mentality profiling, and targeted interview question generation. Supports self-assessment and evaluating others with appropriate ethical boundaries. | hiring, interview, osint, cv-review, recruitment |
+| **technical-blog-post** | Process skill for turning raw project data (research notes, session logs, drafts, code) into structured technical blog posts. Covers gathering, extraction, structure, and Astro frontmatter. | blog, writing, technical-writing, blog-post, astro, content |
 
 ## Installation
 
@@ -24,6 +25,7 @@ Install skills directly from this GitHub repository using Claude Code's marketpl
 /plugin install sams-architecture@sams-skills
 /plugin install outcome-engineering@sams-skills
 /plugin install candidate-assessment@sams-skills
+/plugin install technical-blog-post@sams-skills
 ```
 
 **That's it!** Skills are now available and auto-trigger when Claude detects matching prompts.
@@ -63,7 +65,8 @@ Add to your project's `.claude/settings.json`:
     "sams-voice@sams-skills": true,
     "sams-architecture@sams-skills": true,
     "outcome-engineering@sams-skills": true,
-    "candidate-assessment@sams-skills": true
+    "candidate-assessment@sams-skills": true,
+    "technical-blog-post@sams-skills": true
   }
 }
 ```
@@ -144,6 +147,20 @@ Delivers:
 - Churn risk matrix
 - 10-15 targeted interview questions specific to the candidate
 
+### technical-blog-post
+
+Automatically triggered when:
+- Writing a technical blog post from raw project data
+- Sam says "write a blog post about [project]" or "turn this into a post"
+- Raw source material exists (research notes, session logs, drafts, code)
+
+Process workflow:
+- **Phase 1: Gather** — Find all source material (README, research notes, specs, session logs, drafts, code)
+- **Phase 2: Extract** — Pull out the six-beat narrative arc (hook, problem, approach, discoveries, validation, result)
+- **Phase 3: Write** — Structure with Astro frontmatter, technical deep-dives, and real data
+- **Phase 4: Voice Check** — Verify against `sams-voice` standards (no LLM-isms, real numbers, varied structure)
+- **Phase 5: Astro Frontmatter** — Correct metadata with back-publishing support
+
 ## Repository Structure
 
 ```
@@ -170,11 +187,17 @@ claude-skills/
 │   │   └── skills/
 │   │       └── outcome-engineering/
 │   │           └── SKILL.md
-│   └── candidate-assessment/
+│   ├── candidate-assessment/
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   └── skills/
+│   │       └── candidate-assessment/
+│   │           └── SKILL.md
+│   └── technical-blog-post/
 │       ├── .claude-plugin/
 │       │   └── plugin.json
 │       └── skills/
-│           └── candidate-assessment/
+│           └── technical-blog-post/
 │               └── SKILL.md
 ├── CLAUDE.md                     # Project instructions & maintenance checklist
 └── README.md

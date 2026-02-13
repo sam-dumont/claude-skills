@@ -84,6 +84,23 @@
         "recruitment",
         "self-assessment"
       ]
+    },
+    {
+      "name": "technical-blog-post",
+      "source": "./plugins/technical-blog-post",
+      "description": "Process skill for turning raw project data into structured technical blog posts. Covers gathering, extraction, structure, and Astro frontmatter.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Sam Dumont"
+      },
+      "keywords": [
+        "blog",
+        "writing",
+        "technical-writing",
+        "blog-post",
+        "astro",
+        "content"
+      ]
     }
   ]
 }

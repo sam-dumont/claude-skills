@@ -27,6 +27,7 @@ Optional: a `templates/` directory for supporting materials (see sams-voice for 
 | sams-architecture | Architectural patterns (Python/DevOps/Embedded/Frontend) |
 | outcome-engineering | Outcome-first workflow framing (o16g) |
 | candidate-assessment | Professional candidate assessment with OSINT research |
+| technical-blog-post | Technical blog post writing from raw project data |
 
 ## Mandatory Checklist: Adding or Modifying a Skill
 
