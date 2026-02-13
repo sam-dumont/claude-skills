@@ -573,6 +573,13 @@ The report is the deliverable. Everything else is noise.
 
 The synthesis agent runs a FINAL correlation pass using the Discovered Identifiers from all 4 research agents:
 
+0. **Generic cross-platform sweep first**: Before targeted platform searches, run a broad sweep for every discovered username:
+   - Search: `"[username]" -site:github.com -site:linkedin.com -site:reddit.com -site:stackoverflow.com -site:twitter.com -site:medium.com`
+   - Adjust the `-site:` exclusions to include ALL platforms already searched during Phase 2
+   - This catches unexpected platforms (DeviantArt, Steam, gaming profiles, Last.fm, Bandcamp, niche forums, personal wikis, Mastodon instances) that targeted searches miss
+   - Run this for EVERY unique username discovered, not just the primary one
+   - Any new platform discovered here should then get a targeted deep search
+
 1. **Username propagation**: For every username found on any platform, search for that SAME username on all OTHER platforms:
    - GitHub username → search Reddit, SO, HN, Twitter, Docker Hub, PyPI, npm, etc.
    - Reddit username → search GitHub, SO, Twitter, etc.
@@ -833,10 +840,11 @@ Many platforms block AI tool fetches (403 errors, JavaScript-only rendering, too
 ### Platform-Specific Notes
 
 **Reddit**:
-- Web search tools have poor Reddit indexing. Try multiple query formulations.
-- If web search fails, note it as a limitation rather than concluding no Reddit presence exists.
-- Try: plain project name, project name without hyphens, project URL, project + domain keyword, username + reddit, domain-specific subreddit searches.
-- When you find a post, extract the username and search their full history.
+- Reddit actively blocks AI crawlers — both `site:reddit.com` searches and direct URL fetches often fail with 403 errors or empty results.
+- Try web search first: plain project name, project name without hyphens, project URL, project + domain keyword, username + reddit, domain-specific subreddit searches.
+- **When web search fails, use archive APIs immediately** — do not conclude "no Reddit presence." Use Arctic Shift API (`arctic-shift.photon-reddit.com/api/posts/search?author=[username]&limit=100`) or PullPush (`api.pullpush.io`) as fallback. See the Reddit Archive Fallback section in Agent A for full URL patterns.
+- When you find a post (via any method), extract the username and search their full history through the archive API.
+- **Verification reminder**: A matching username on Reddit (even identical to their GitHub/Last.fm handle) does NOT confirm identity. Always apply the Link Classification rules — identity verification gate for Self-Assessment Enhanced, explicit links only for Evaluating Others.
 
 **GitHub**:
 - Stars and followers are vanity metrics. Look at: contribution frequency, code quality in repos, PR review comments, issue discussions.
