@@ -280,9 +280,9 @@ Before searching registries, determine which ones are relevant based on the cand
 **Step 1: Identify the candidate's domain bucket(s)** from Phase 1 data and domain classification. A candidate may span multiple buckets.
 
 **Technical:**
-- Software Engineering → code registries (npm, PyPI, crates.io, Docker Hub, etc.)
+- Software Engineering → code registries (npm via `registry.npmjs.org/{package}` API, PyPI, crates.io, Docker Hub via `hub.docker.com/v2/repositories/{namespace}/{repo}/` API, etc.)
 - Data Science / ML → model hubs (Hugging Face), competition platforms (Kaggle), data registries
-- DevOps / Platform → infra registries (Terraform Registry, Ansible Galaxy, Helm/artifacthub.io, Docker Hub)
+- DevOps / Platform → infra registries (Terraform Registry via `registry.terraform.io/v1/providers/{namespace}/{name}` API, Ansible Galaxy, Helm/artifacthub.io, Docker Hub via `hub.docker.com/v2/repositories/` API)
 - Security / InfoSec → vulnerability databases, CTF platforms (CTFtime, HackerOne, Bugcrowd)
 - Mobile Development → app stores (App Store, Play Store, Garmin Connect IQ)
 - Design / UX → portfolio platforms (Dribbble, Behance, Figma Community)
@@ -657,6 +657,38 @@ Generate 10-15 interview questions specifically tailored to THIS candidate. Not 
 
 ## OSINT Search Strategy Reference
 
+### Platform Access & Fallback Protocol
+
+Many platforms block AI tool fetches (403 errors, JavaScript-only rendering, tool deny-lists). When a direct fetch returns 403, empty content, or "enable JavaScript", **immediately try the API alternative below before falling back to web search. Do NOT retry the blocked URL or conclude the platform has no data.**
+
+#### Platforms with Working API Alternatives
+
+| Platform | Block Type | Working Alternative URL | Notes |
+|----------|-----------|------------------------|-------|
+| **Twitter/X** | JS wall | `syndication.twitter.com/srv/timeline-profile/screen-name/{username}` | Twitter's own SSR endpoint. Backup: `nitter.tiekoetter.com/{username}` or `twiiit.com/{username}` (auto-discovers working Nitter instances) |
+| **Stack Overflow** | Tool deny-list (all SO/SE domains) | WebSearch `"{name}" stackoverflow reputation answers` | Google snippets contain full metrics (rep, badges, tags). No direct access workaround exists. |
+| **npm** | 403 on website | `registry.npmjs.org/{package}` or `registry.npmjs.org/-/v1/search?text={query}&size=10` | JSON API returns full package metadata |
+| **Docker Hub** | JS SPA | `hub.docker.com/v2/repositories/{namespace}/{repo}/` | JSON API with pull counts, stars, tags |
+| **Terraform Registry** | JS wall | `registry.terraform.io/v1/providers/{namespace}/{name}` | JSON API with download counts, versions |
+| **ORCID** | JS SPA | `pub.orcid.org/v3.0/{orcid-id}` | JSON API with publications, employment, keywords |
+| **FINRA BrokerCheck** | JS SPA | `api.brokercheck.finra.org/search/individual?query={name}&nrows=10` | JSON API with CRD numbers, firm affiliations |
+| **Google Scholar** | JS SPA | `api.semanticscholar.org/graph/v1/author/search?query={name}` | Rate-limited; add `&fields=name,hIndex,citationCount,paperCount` for metrics |
+| **IMDb** | Processing failure | `dbpedia.org/data/{Person_Name}.json` | Structured data. Also try `themoviedb.org/person/{id}-{name}` or `rottentomatoes.com/celebrity/{slug}` |
+
+#### Platforms with No Direct Access (Web Search Only)
+
+| Platform | Block Type | Recommended Fallback |
+|----------|-----------|---------------------|
+| **Medium** | 403 | WebSearch; check author's personal blog for cross-posts |
+| **Glassdoor** | 403 | WebSearch `"company" reviews site:glassdoor.com` |
+| **Crunchbase** | 403 + API auth required | WebSearch for funding data; Wikipedia company pages |
+| **SEC EDGAR** | 403 (requires custom User-Agent) | WebSearch `site:sec.gov "company" 10-K` |
+| **Product Hunt** | 403 | WebSearch `site:producthunt.com "product name"` |
+| **Wellfound/AngelList** | 403 | WebSearch `site:wellfound.com "company"` |
+| **Kaggle** | JS SPA + API auth | WebSearch `site:kaggle.com "username"` |
+| **Behance** | JS SPA | WebSearch `site:behance.net "username"`; try Dribbble or ArtStation instead |
+| **USPTO TSDR** | 403 | Use Google Patents (works!) as full alternative |
+
 ### Effective Search Patterns
 
 | Goal | Search Pattern | Notes |
@@ -678,6 +710,14 @@ Generate 10-15 interview questions specifically tailored to THIS candidate. Not 
 | Verify company claims | `"[Company Name]" crunchbase OR glassdoor OR linkedin` | Cross-reference size, funding, status |
 | Find archived content | `"First Last" site:web.archive.org` | For deleted blogs/sites |
 | Find design work | `"First Last" site:dribbble.com OR site:behance.net` | For design-oriented candidates |
+| Fetch Twitter/X profile | `syndication.twitter.com/srv/timeline-profile/screen-name/{username}` | Twitter's own SSR endpoint; fallback to `nitter.tiekoetter.com/{username}` |
+| Search npm packages | `registry.npmjs.org/-/v1/search?text={query}&size=10` | JSON API; also `registry.npmjs.org/{package}` for specific package |
+| Fetch Docker Hub repo | `hub.docker.com/v2/repositories/{namespace}/{repo}/` | JSON API with pull counts, stars, tags |
+| Fetch Terraform provider | `registry.terraform.io/v1/providers/{namespace}/{name}` | JSON API with download counts, versions |
+| Fetch ORCID profile | `pub.orcid.org/v3.0/{orcid-id}` | JSON API with publications, employment, keywords |
+| Search FINRA brokers | `api.brokercheck.finra.org/search/individual?query={name}&nrows=10` | JSON API with CRD numbers, firm affiliations |
+| Search academic authors | `api.semanticscholar.org/graph/v1/author/search?query={name}` | JSON; add `&fields=name,hIndex,citationCount,paperCount` for metrics |
+| Fetch film/TV credits | `dbpedia.org/data/{Person_Name}.json` | Structured data; also try `themoviedb.org/person/{id}` or `rottentomatoes.com/celebrity/{slug}` |
 
 ### Search Tips (Learned from Live Testing)
 - Plain keywords consistently outperform exact-match quoted strings for Reddit
@@ -705,6 +745,7 @@ Generate 10-15 interview questions specifically tailored to THIS candidate. Not 
 - Check for Terraform providers (`terraform-provider-*` repos) — these are written in Go and signal deep IaC knowledge.
 
 **Stack Overflow**:
+- **ALL stackoverflow.com and stackexchange.com domains are tool-level blocked** — direct fetch will always fail. Use WebSearch with `"{name}" stackoverflow reputation` to extract metrics from Google snippets (rep, badges, top tags). No direct access workaround exists.
 - Look at the questions they ask, not just answers. Someone asking good questions in advanced topics signals genuine learning depth.
 - Check tags the user is active in — this reveals their actual expertise areas vs. claimed ones.
 - Self-answered questions often document solutions to hard problems.
@@ -714,6 +755,7 @@ Generate 10-15 interview questions specifically tailored to THIS candidate. Not 
 - Check activity feed for posts and comments — reveals communication style and thought leadership.
 
 **Terraform Registry**:
+- The website is JS-only. Use the API: `registry.terraform.io/v1/providers/{namespace}/{name}` returns JSON with download counts and versions.
 - Search for the candidate's GitHub username/org.
 - Published providers require deep Go AND Terraform knowledge — this is a very strong signal.
 - Published modules indicate IaC maturity.
@@ -723,6 +765,29 @@ Generate 10-15 interview questions specifically tailored to THIS candidate. Not 
 - Look for co-authors — reveals collaboration networks.
 - Check if papers are in high-impact venues (top-tier conferences, high-IF journals).
 - Pre-prints on arXiv/bioRxiv signal active research engagement.
+
+**Twitter/X**:
+- All twitter.com/x.com pages are JS-only and will fail to render. Use `syndication.twitter.com/srv/timeline-profile/screen-name/{username}` (Twitter's own widget endpoint) as primary fallback.
+- If the syndication endpoint fails, try `nitter.tiekoetter.com/{username}` (rate-limited) or `twiiit.com/{username}` (auto-discovers working Nitter instances).
+- For thread-heavy users, check `threadreaderapp.com/user/{username}` for unrolled threads.
+
+**npm / Docker Hub**:
+- npm website returns 403. Use the JSON API: `registry.npmjs.org/{package}` for package details, `registry.npmjs.org/-/v1/search?text={query}&size=10` for searching by author/keyword.
+- Docker Hub is a JS SPA. Use the API: `hub.docker.com/v2/repositories/{namespace}/{repo}/` returns JSON with pull counts, stars, and tags.
+
+**Crunchbase / Glassdoor**:
+- Both return 403 with no API workaround (paid API keys required). Use WebSearch as fallback.
+- For Crunchbase data: WebSearch for funding rounds, check Wikipedia company pages, and AngelList/Wellfound profiles.
+- For Glassdoor: WebSearch `"company" reviews site:glassdoor.com` — Google snippets often include rating and review counts.
+
+**SEC EDGAR**:
+- All sec.gov endpoints return 403 (they require a custom User-Agent header that tools cannot set). Use WebSearch `site:sec.gov "company" 10-K` for indexed filings. Google typically indexes the most recent filings.
+
+**IMDb**:
+- Direct fetch fails (processing error). For film/TV credit verification, use:
+  - `dbpedia.org/data/{Person_Name}.json` — structured data from Wikipedia/DBpedia
+  - `themoviedb.org/person/{id}-{name}` — full credits and bio (web-accessible)
+  - `rottentomatoes.com/celebrity/{slug}` — filmography with audience/critic scores
 
 ### Domain-Adaptive Search
 
