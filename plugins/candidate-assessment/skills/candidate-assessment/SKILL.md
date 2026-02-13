@@ -122,7 +122,8 @@ Build an initial profile using web research:
 4. **Build the same structured profile** as CV Mode, but note confidence level for each data point
 
 Search strategy for Name-Only:
-- `"First Last" site:linkedin.com [job title]`
+- `"First Last" site:getprog.ai` — for tech candidates, getprog.ai mirrors full LinkedIn profiles (experience, education, skills, about). WebFetch the result URL for complete data.
+- `"First Last" site:linkedin.com [job title]` — Google/Bing snippets show headline, role, location even without LinkedIn access
 - `"First Last" site:github.com`
 - `"First Last" [company name]`
 - `"First Last" [specialization] [location]`
@@ -770,6 +771,7 @@ Many platforms block AI tool fetches (403 errors, JavaScript-only rendering, too
 
 | Platform | Block Type | Working Alternative URL | Notes |
 |----------|-----------|------------------------|-------|
+| **LinkedIn** | Login wall + JS SPA | Two-step: (1) WebSearch `"First Last" site:getprog.ai` to find profile URL; (2) WebFetch `getprog.ai/profile/{id}` for full data | Returns complete profile: name, headline, experience with dates/descriptions, education, skills (74+), about section. Coverage: ~60M tech profiles. For non-tech candidates, fall back to WebSearch `"First Last" site:linkedin.com [job title]` + Bing snippets. Also try `theorg.com` for org chart/team data. |
 | **Twitter/X** | Full block (JS wall + Nitter dead + syndication empty) | No working direct access. | All Nitter instances (xcancel.com, nitter.tiekoetter.com) and Twitter's syndication endpoint are dead as of 2025. Use WebSearch only: `"username" site:twitter.com OR site:x.com`. Google still indexes tweets. Also try `"username" twitter` without site filter. |
 | **Stack Overflow** | Tool deny-list (all SO/SE domains) | WebSearch `"{name}" stackoverflow reputation answers` | Google snippets contain full metrics (rep, badges, tags). No direct access workaround exists. |
 | **npm** | 403 on website | `registry.npmjs.org/{package}` or `registry.npmjs.org/-/v1/search?text={query}&size=10` | JSON API returns full package metadata |
@@ -799,7 +801,8 @@ Many platforms block AI tool fetches (403 errors, JavaScript-only rendering, too
 
 | Goal | Search Pattern | Notes |
 |------|---------------|-------|
-| Find LinkedIn | `"First Last" site:linkedin.com [job title]` | Most reliable starting point |
+| Find LinkedIn (full profile) | `"First Last" site:getprog.ai` then WebFetch the result URL | Returns complete experience, education, skills, about section. Tech profiles only (~60M). |
+| Find LinkedIn (any profile) | `"First Last" site:linkedin.com [job title]` | Google snippets show headline, current role, location. Bing often shows more. |
 | Find GitHub | `"First Last" site:github.com` or search GitHub directly | Check contributions, not just repos |
 | Find Reddit activity | `[project name] site:reddit.com` (NO quotes on project name) | Plain keywords work better than exact match |
 | Reddit via archive API | `arctic-shift.photon-reddit.com/api/posts/search?author=[username]&limit=100` | Bypasses Reddit bot blocking; also search comments and keywords. Use for EVERY known handle. |
@@ -859,6 +862,11 @@ Many platforms block AI tool fetches (403 errors, JavaScript-only rendering, too
 - Self-answered questions often document solutions to hard problems.
 
 **LinkedIn**:
+- **Direct access is blocked** (login wall + JS SPA). Use the getprog.ai workaround for tech profiles:
+  1. WebSearch `"First Last" site:getprog.ai` — finds their profile page (search snippets already contain headline and summary)
+  2. WebFetch the `getprog.ai/profile/{id}` URL — returns FULL profile: name, headline, experience (with dates, descriptions), education, all skills (74+), about section
+  3. This works for ~60M software engineer profiles. For non-tech candidates, fall back to WebSearch with `"First Last" site:linkedin.com [job title]` — Google/Bing snippets show headline, current role, and sometimes about section excerpts
+- For company org charts and team data, try WebFetch on `theorg.com/org/{company-name}`
 - Recommendations from senior people carry more weight. Look at WHO recommends them, not just how many recommendations.
 - Check activity feed for posts and comments — reveals communication style and thought leadership.
 
