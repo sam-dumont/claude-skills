@@ -1,0 +1,13 @@
+{
+  "name": "candidate-assessment",
+  "version": "1.0.0",
+  "description": "Deep professional assessment combining CV analysis, OSINT research, mentality profiling, and targeted interview question generation. Supports self-assessment and evaluating others with appropriate ethical boundaries.",
+  "author": {
+    "name": "Sam Dumont",
+    "email": "sam@dropbars.be"
+  },
+  "homepage": "https://github.com/sam-dumont/claude-skills",
+  "repository": "https://github.com/sam-dumont/claude-skills",
+  "license": "MIT",
+  "keywords": ["candidate-assessment", "hiring", "interview", "osint", "cv-review", "resume", "profiling", "recruitment", "self-assessment"]
+}
