@@ -1,6 +1,6 @@
 {
   "name": "candidate-assessment",
-  "version": "1.3.9",
+  "version": "1.3.10",
   "description": "Deep professional assessment combining CV analysis, OSINT research, mentality profiling, and targeted interview question generation. Supports self-assessment and evaluating others with appropriate ethical boundaries.",
   "author": {
     "name": "Sam Dumont",
