@@ -87,6 +87,7 @@ jobs:
             - **sams-architecture**: Architectural patterns (Python/DevOps/Embedded)
             - **outcome-engineering**: Outcome-first workflow framing (o16g)
             - **candidate-assessment**: Professional candidate assessment with OSINT research
+            - **technical-blog-post**: Technical blog post writing from raw project data
 
             ### Installation
 
@@ -99,6 +100,7 @@ jobs:
             /plugin install sams-architecture@sams-skills
             /plugin install outcome-engineering@sams-skills
             /plugin install candidate-assessment@sams-skills
+            /plugin install technical-blog-post@sams-skills
             ```
 
             ### What's Changed
