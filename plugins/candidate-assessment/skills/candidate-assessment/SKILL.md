@@ -152,6 +152,46 @@ This seed list is the foundation for cross-platform research. Every identifier g
 
 ---
 
+## Phase 1.75: Pre-Research Identity Collection (Self-Assessment Enhanced Only)
+
+**Skip this phase entirely** in Evaluating Others mode and Self-Assessment Basic mode. Go directly to Phase 2.
+
+Before launching research agents, ask the user to voluntarily declare their online accounts. This prevents handles from leaking through Claude Code's permission prompts during research — if the user declares a handle, agents can freely fetch it without the permission prompt revealing something the user didn't already know.
+
+**Procedure**:
+
+1. **Show already-discovered accounts**: List all accounts/handles found from explicit sources during Phase 1 (CV links, LinkedIn, GitHub bio cross-links, personal website). Example:
+   > "From your CV and profiles, I've already found these accounts:
+   > - GitHub: @yourhandle
+   > - LinkedIn: /in/yourslug
+   > - Personal site: yoursite.com
+   >
+   > These will be included in the research."
+
+2. **Open-ended question**: Ask:
+   > "Do you have accounts on any other platforms you'd like me to include in the assessment? This helps me research more thoroughly. Just list the platform and username — for example, 'Reddit: @myhandle' or 'Stack Overflow: user12345'."
+
+   **Do NOT provide a platform checklist** — listing specific platforms (Reddit, Stack Overflow, Steam, etc.) is leading and could reveal what you intend to search. Keep it open-ended.
+
+3. **Skip option**: Offer:
+   > "You can also skip this — I'll still find what I can through public research, though some accounts may need identity verification before I can include them."
+
+4. **Build the pre-authorized list**: Combine:
+   - All accounts from Phase 1 (explicit links on CV/profiles)
+   - All accounts the user declares here
+   - These become **pre-authorized** — agents can freely fetch them, and the handles appearing in permission prompts is acceptable since the user already knows about them
+
+**Pass to agents**: Along with the seed list from Phase 1.5, pass agents:
+- The **pre-authorized accounts list** (platform + handle pairs)
+- A **deferred-fetch flag** signaling that the Deferred Fetching Protocol is active
+
+**Edge cases**:
+- If the user skips this phase: all discovered handles go through the Deferred Fetching Protocol → more verification questions in Phase 2.5, but same quality result
+- If the user provides a handle that doesn't exist: agent notes "pre-authorized but not found" — not suspicious, people forget old usernames
+- If the user provides a handle that belongs to someone else: the assessment will include that account's data (they authorized it), but cross-referencing in Phase 2.75 may flag inconsistencies
+
+---
+
 ## Phase 2: Deep Research (4 Parallel Agents)
 
 Launch 4 research agents in parallel. Each has a specific focus area. Pass the full seed list from Phase 1.5 to every agent.
@@ -189,9 +229,47 @@ Produce a structured summary of ALL your findings. This digest must be self-cont
 - Specific quotes or data points that matter (don't just say "active GitHub" — say "mass contributions in 2023, mass Go code, mass Terraform providers, 2.1k stars on project X")
 - Target length: 1500-3000 words. Err on the side of MORE detail, not less. The synthesis agent cannot go back and read your full output — if it's not in the digest, it's lost.
 
+**Section 3 — Deferred Handles** (Self-Assessment Enhanced mode only — omit in other modes):
+
+List every handle discovered during research that was NOT fetched due to the Deferred Fetching Protocol. For each:
+- **Platform**: e.g., Reddit, Stack Overflow, Steam, DeviantArt
+- **Handle**: the discovered username
+- **Discovery method**: how you found it (e.g., "same handle as GitHub username", "mentioned in HN comment", "project name search returned post by this user")
+- **Link strength**: Strong implicit / Weak implicit / Circumstantial (per the Link Classification table)
+- **Snippet context**: any information gleaned from search snippets WITHOUT fetching the profile URL (e.g., "WebSearch snippet shows posts in r/golang and r/running")
+- **Suggested challenge questions**: 2-3 questions the main agent can use in Phase 2.5 to verify identity, based on whatever snippet context is available
+
 These will be cross-referenced by a dedicated synthesis agent after all 4 agents complete. The synthesis agent operates with a fresh context window and reads ONLY the digests, so completeness is critical.
 
 **Depth over breadth**: Do not skim 20 platforms. Go DEEP on the platforms where you find signal. One Reddit username leading to 50 comments is worth more than checking 10 platforms and finding nothing. Follow every thread.
+
+#### Deferred Fetching Protocol (Self-Assessment Enhanced Only)
+
+In Self-Assessment Enhanced mode, agents receive three additional inputs from Phase 1.75:
+1. **Pre-authorized accounts**: handles the user declared + explicit links from Phase 1. Agents may freely fetch these.
+2. **Seed identifiers**: unchanged from Phase 1.5.
+3. **Deferred-fetch flag**: signals that this protocol is active.
+
+For handles discovered DURING research that are NOT pre-authorized and NOT from explicit links (i.e., the candidate didn't publicly link them from a known profile):
+
+**Agents CAN:**
+- Run WebSearch queries mentioning the handle (search queries don't expose profile URLs in permission prompts)
+- Read search result snippets returned by WebSearch
+- Search archive APIs by keyword (e.g., `?q=[project-name]`) — NOT by author parameter
+
+**Agents MUST NOT:**
+- Fetch any URL containing the discovered handle in path or query parameters via WebFetch or curl
+- This includes: `old.reddit.com/user/{handle}`, `arctic-shift.../api/posts/search?author={handle}`, `stackoverflow.com/users/{id}/{slug}`, `hub.docker.com/v2/repositories/{handle}/`, etc.
+- The reason: Claude Code's permission system shows the full URL before executing the fetch, which leaks the handle to the user before identity verification
+
+**Agents MUST instead:**
+- Record the handle in their **Section 3 — Deferred Handles** output (see agent output format above)
+- Include: platform, handle, discovery method, link strength, snippet context, and suggested challenge questions
+- Continue researching using search-only methods to gather what context they can from snippets
+
+**Exemption**: If the handle was found through an **explicit link** on a verified profile (e.g., the candidate's GitHub bio says "Reddit: @myhandle"), it is NOT subject to deferral. Fetch freely.
+
+**In all other modes** (Evaluating Others, Self-Assessment Basic): This protocol does not apply. Evaluating Others never fetches pseudonymous profiles anyway. Self-Assessment Basic does not do pseudonym linking.
 
 ### Agent A: Online Presence & Digital Footprint
 
@@ -240,10 +318,11 @@ Reddit's search is notoriously poor. Web search indexing of Reddit is also unrel
 
 **When you find ONE Reddit post by the candidate**:
 1. Extract the Reddit username
-2. Search for that username's full post and comment history: `author:[username] site:reddit.com` or `site:reddit.com/user/[username]`
-3. Scan their history for: other projects mentioned, expertise signals, tone/personality, interests, community involvement
-4. Check if they moderate any subreddits
-5. Look for AMAs, detailed technical comments, or help given to others
+2. **Check the Deferred Fetching Protocol** (Self-Assessment Enhanced only): If this handle is NOT pre-authorized and NOT from an explicit link, do NOT fetch `site:reddit.com/user/[username]` or any URL containing the handle. Instead, record it in the Deferred Handles output section with suggested challenge questions, and use search-only methods (WebSearch queries, keyword searches on archive APIs without the `author=` parameter) to gather context from snippets.
+3. If the handle IS pre-authorized or from an explicit link: Search for that username's full post and comment history: `author:[username] site:reddit.com` or `site:reddit.com/user/[username]`
+4. Scan their history for: other projects mentioned, expertise signals, tone/personality, interests, community involvement
+5. Check if they moderate any subreddits
+6. Look for AMAs, detailed technical comments, or help given to others
 
 **Do NOT give up after 1-2 failed queries.** Try at least 5 different formulations before concluding no Reddit presence exists. Log which queries you tried.
 
@@ -267,6 +346,7 @@ Reddit actively blocks AI tools — both `site:reddit.com` web searches and dire
 3. If you found a plausible Reddit username from another platform (e.g., same handle on GitHub, Last.fm, DeviantArt, Steam), search that username via Arctic Shift even if web search found nothing
 4. Use the keyword search to find posts mentioning the candidate's projects or unique identifiers
 5. **ALWAYS try the archive APIs for every known username/handle** — do not rely solely on web search for Reddit
+6. **Deferred Fetching Protocol** (Self-Assessment Enhanced only): If the handle is NOT pre-authorized and NOT from an explicit link, do NOT use `author=[username]` in API calls (e.g., `arctic-shift.../api/posts/search?author=[username]`) — this is a direct profile query that may leak the handle via permission prompts. Instead, use **keyword searches** (`?q=[project-name]&limit=100`) to find relevant posts without specifying the author. Record the handle in the Deferred Handles output section.
 
 **Identity verification still applies**: Finding a Reddit account with a matching username does NOT confirm identity. Same username ≠ same person. In Self-Assessment Enhanced mode, still run the identity verification gate before linking. In Evaluating Others mode, only use if the candidate explicitly links their Reddit account from a known profile.
 
@@ -275,9 +355,10 @@ Reddit actively blocks AI tools — both `site:reddit.com` web searches and dire
 1. Search by display name: `user:[name] site:stackoverflow.com`
 2. Search by project name: `[project-name] site:stackoverflow.com`
 3. Search by GitHub username — SO profiles often link to GitHub
-4. Check for questions ASKED (reveals learning areas) and answers GIVEN (reveals expertise)
-5. Check tags the user is active in
-6. Look for self-answered questions (often document solutions to hard problems they encountered)
+4. **Check the Deferred Fetching Protocol** (Self-Assessment Enhanced only): If you discover a SO user ID/profile URL for a handle that is NOT pre-authorized and NOT from an explicit link, do NOT fetch `stackoverflow.com/users/{id}/{slug}`. Record it in Deferred Handles with suggested challenge questions (e.g., "What is your approximate reputation?", "Name one of your top tags"). Use WebSearch snippets only.
+5. If the handle IS pre-authorized or from an explicit link: Check for questions ASKED (reveals learning areas) and answers GIVEN (reveals expertise)
+6. Check tags the user is active in
+7. Look for self-answered questions (often document solutions to hard problems they encountered)
 
 #### Credential Verification Protocol (licensed professions)
 
@@ -370,6 +451,8 @@ Before searching registries, determine which ones are relevant based on the cand
 
 **Step 2: For EACH identified domain**, search the relevant registries for the candidate's username, real name, and known project names.
 
+**Deferred Fetching applies here** (Self-Assessment Enhanced only): When searching registries that include a discovered handle in the URL (e.g., `hub.docker.com/v2/repositories/{handle}/`, `registry.terraform.io/v1/providers/{handle}/{name}`), check whether the handle is pre-authorized. If NOT, use WebSearch to find evidence of published artifacts (e.g., `"{handle}" site:hub.docker.com`) rather than fetching the API URL directly. Record the handle in Deferred Handles if you find signal.
+
 **Step 3: Check for cross-domain registries** that apply broadly:
 - LinkedIn (universal)
 - GitHub/GitLab (nearly universal for technical roles)
@@ -388,9 +471,11 @@ Publishing to any registry or platform is a strong signal — it requires packag
 | **Implicit (Weak)** | Same common name, overlapping interests, but no unique identifier | LinkedIn "John Smith, Python dev" + SO user "john_s" answering Python questions | ❌ IGNORE | ❌ IGNORE | ⚠️ Flag for verification but low confidence |
 | **Circumstantial** | Timing correlation, geographic match, but no content link | Reddit account created same month as a job change | ❌ IGNORE | ❌ IGNORE | ❌ IGNORE (not enough signal) |
 
-**For Evaluating Others**: Only explicit links. Period. If you can't trace a public, candidate-created link between two profiles, they are separate identities. This is not optional.
+**For Evaluating Others**: Only explicit links. Period. If you can't trace a public, candidate-created link between two profiles, they are separate identities. This is not optional. Note: the handle-leak problem via permission prompts is N/A for this mode — you never fetch pseudonymous profile URLs in the first place.
 
 **For Self-Assessment Enhanced**: Find ALL implicit links. For each one, run the identity verification gate BEFORE including it. Batch verifications when possible — "I found potential accounts on Reddit and Stack Overflow. Let me verify both."
+
+**Explicit links found during research are exempt from deferral**: If an agent discovers that a known, verified profile (e.g., GitHub bio, personal website) explicitly links to another account (e.g., "Find me on Reddit: @myhandle"), that handle is treated as an explicit link per the table above. Agents may fetch it freely — no deferred fetching needed, no verification gate required. The key test: did the candidate themselves publicly create the link from a verified identity?
 
 **Absence of signal is NOT negative signal.** Many excellent professionals have minimal online presence. Not having a blog, GitHub contributions, or public portfolio says nothing about competence. Note the absence without judgment.
 
@@ -520,9 +605,11 @@ In Self-Assessment Enhanced mode, the MAIN agent must handle identity verificati
 
 **Procedure**:
 
+0. **Read Deferred Handles** from all 4 agents. Collect the full list of handles that agents discovered but did NOT fetch due to the Deferred Fetching Protocol. Each entry includes: platform, handle, how discovered, link strength, snippet context, and suggested challenge questions. Cross-reference against the pre-authorized accounts list from Phase 1.75 — any handle the user already declared is already authorized and does not need verification.
+
 1. **Read ONLY the Discovered Identifiers sections** from all 4 agents (these are short lists — they fit in context). Do NOT read the full agent outputs or digests yet.
 
-2. **Identify potential pseudonymous links**: Compare identifiers across agents. Look for:
+2. **Identify potential pseudonymous links**: Compare identifiers across agents, including Deferred Handles. Look for:
    - Same username appearing on multiple platforms without explicit cross-linking
    - Same project name on platforms associated with different identities
    - Usernames matching known handles on new, unexpected platforms
@@ -534,7 +621,13 @@ In Self-Assessment Enhanced mode, the MAIN agent must handle identity verificati
 
 4. **Record results**: For each potential link, record: Verified ✅ or Rejected ❌. Rejected links are PERMANENTLY excluded — they must never appear in any subsequent output.
 
-5. **Pass verification results to the synthesis agent** in Phase 2.75.
+5. **Post-Verification Fetch** (Deferred Handles only): For each deferred handle that PASSED verification:
+   - **NOW** fetch the profile URL (e.g., `old.reddit.com/user/{handle}`, `stackoverflow.com/users/{id}/{slug}`, archive APIs with `author={handle}`). The user has confirmed ownership, so the handle appearing in a permission prompt is acceptable.
+   - Use the same platform-specific access methods documented in the OSINT Reference section (WebFetch → API → browser-emulating curl → WebSearch fallback).
+   - Append the retrieved data to the relevant agent's digest before passing to the synthesis agent.
+   - For each deferred handle that FAILED verification: the profile URL is **never fetched**. The handle never appears in any permission prompt. The user never learns what was discovered. Remove it from all outputs.
+
+6. **Pass verification results AND fetched data to the synthesis agent** in Phase 2.75. This must happen AFTER step 5 — the synthesis agent needs the post-verification profile data to produce a complete report.
 
 ---
 
@@ -548,9 +641,11 @@ In Self-Assessment Enhanced mode, the MAIN agent must handle identity verificati
    - The candidate's name, target role, and assessment mode (Self-Assessment / Evaluating Others)
    - The structured profile from Phase 1
    - The seed list from Phase 1.5
+   - The **pre-authorized accounts list** from Phase 1.75 (if Self-Assessment Enhanced)
    - The full Agent Digest sections from all 4 research agents (copy-paste the digest text — do NOT ask the synthesis agent to read files)
    - The full Discovered Identifiers sections from all 4 research agents
-   - Identity verification results from Phase 2.5 (which links are verified ✅, which are rejected ❌). Instruct the synthesis agent: "Do NOT include any information from rejected links in the report. Treat rejected accounts as if they do not exist."
+   - The full Deferred Handles sections from all 4 research agents (if any)
+   - Identity verification results from Phase 2.5 (which links are verified ✅, which are rejected ❌, which deferred handles were fetched post-verification). Instruct the synthesis agent: "Do NOT include any information from rejected links in the report. Treat rejected accounts as if they do not exist."
 
 2. **Instructions for the synthesis agent**: The synthesis agent must perform Phase 2.75 (Cross-Platform Correlation) AND Phase 3 (Final Report) as described below. Its output IS the final report shown to the user.
 
@@ -558,7 +653,9 @@ In Self-Assessment Enhanced mode, the MAIN agent must handle identity verificati
 - Identity verification questions (Phase 2.5, if applicable)
 - A brief "Starting assessment..." message at the very beginning
 
-Once the synthesis agent returns, relay its complete output to the user and STOP IMMEDIATELY. Do not:
+Once the synthesis agent returns, **write the full report to a markdown file** (e.g., `{candidate-name}-assessment.md` in the current working directory) for easy review. Then relay its complete output to the user and STOP IMMEDIATELY. Mention the file path so the user can open it.
+
+Do not:
 - Summarize the report ("Here's a quick summary of what 4 agents found...")
 - Add commentary ("The biggest finding is...")
 - Show agent statistics ("4 agents, 390+ tool calls, 200+ web searches...")
@@ -593,7 +690,13 @@ The synthesis agent runs a FINAL correlation pass using the Discovered Identifie
 
 3. **Include only verified links**: In Self-Assessment Enhanced mode, only include accounts that passed the verification gate in Phase 2.5. Never mention, reference, or use data from rejected accounts.
 
-4. **Evidence strengthening**: Use cross-platform findings to upgrade evidence levels:
+4. **Deferred fetching for new discoveries** (Self-Assessment Enhanced only): If cross-platform correlation reveals a NEW handle not in the pre-authorized list and not already verified in Phase 2.5:
+   - Use **search-only methods** (WebSearch) — do NOT fetch the profile URL directly
+   - Do NOT reveal the handle in any output
+   - Note in "Signal Gaps & Open Questions" (Section 3.6): "Additional account potentially discovered on [platform]. Not included as identity was not verified."
+   - This ensures no new handle leaks through permission prompts during synthesis
+
+5. **Evidence strengthening**: Use cross-platform findings to upgrade evidence levels:
    - A skill rated "Weak" based on GitHub alone might become "Moderate" if a SO answer or Reddit discussion demonstrates depth
    - A skill rated "Moderate" might become "Strong" if a published registry artifact confirms it
 
