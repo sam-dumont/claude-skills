@@ -90,11 +90,13 @@ Extract the following structured data from the provided CV/resume:
 |--------|---------|------|----------|---------------------|
 | ... | ... | ... | ... | ... |
 
-### Technical Skills (as claimed)
-- Languages:
-- Frameworks:
-- Infrastructure:
-- Other:
+### Skills & Expertise (as claimed)
+Adapt categories to the candidate's domain:
+- **Technical roles**: Languages, Frameworks, Infrastructure, Tools
+- **Business roles**: Methodologies, Markets, Industries, Tools (CRM, ERP, etc.)
+- **Creative roles**: Media, Tools, Styles, Formats
+- **Licensed professions**: Licenses, Certifications, Jurisdictions, Specializations
+- **Academic roles**: Research areas, Methods, Grants, Teaching subjects
 
 ### Education & Certifications
 
@@ -129,17 +131,49 @@ Search strategy for Name-Only:
 
 ---
 
+## Phase 1.5: Identifier Collection
+
+Before launching research agents, compile ALL discovered identifiers into a seed list. This list is passed to ALL 4 agents as input.
+
+**Collect from Phase 1 (CV, LinkedIn, GitHub, personal website, any provided links)**:
+
+- **Full name** + variations (First Last, F. Last, username-style: firstlast, first-last, first.last)
+- **All usernames/handles** found on any platform (GitHub handle, LinkedIn slug, etc.)
+- **Email addresses** visible in profiles, git commits, or website contact pages
+- **All project/repo names** — every single one, including forks
+- **Company names** with periods of employment
+- **Domain names** (personal sites, company sites)
+- **Unique technical terms** — niche technologies, specific product names, framework names the candidate is associated with
+
+This seed list is the foundation for cross-platform research. Every identifier gets searched on every relevant platform.
+
+**Domain Classification**: Based on Phase 1 data, classify the candidate into one or more professional domains. This determines which search protocols, registries, and verification databases agents should prioritize. A candidate can span multiple domains (e.g., "Software Engineering + Entrepreneurship" or "Legal + Government/Policy"). Refer to the Domain-Adaptive Search table in the OSINT Reference section for the full list of domains and their associated search strategies.
+
+---
+
 ## Phase 2: Deep Research (4 Parallel Agents)
 
-Launch 4 research agents in parallel. Each has a specific focus area.
+Launch 4 research agents in parallel. Each has a specific focus area. Pass the full seed list from Phase 1.5 to every agent.
+
+**Thoroughness calibration**: A thorough assessment should perform 40-60+ web searches per agent. If an agent completes with fewer than 20 searches, it likely didn't go deep enough. Each project, username, and company name should be searched across multiple platforms. Each claimed skill should be verified through at least 2-3 different search angles. Don't be satisfied with the first result — dig into second and third pages of results, try alternative query formulations, and follow every promising lead.
+
+**Critical instruction for ALL agents**: At the end of your research, output a **Discovered Identifiers** section listing:
+- All usernames/handles found (platform: username)
+- All project names found with URLs
+- All email addresses found
+- Any other unique identifiers
+
+These will be cross-referenced by the synthesizing agent after all 4 agents complete. The synthesis phase will use identifiers from ALL agents to run a final cross-platform correlation pass.
+
+**Depth over breadth**: Do not skim 20 platforms. Go DEEP on the platforms where you find signal. One Reddit username leading to 50 comments is worth more than checking 10 platforms and finding nothing. Follow every thread.
 
 ### Agent A: Online Presence & Digital Footprint
 
-Research the candidate's public digital presence.
+Research the candidate's public digital presence using the seed list from Phase 1.5. This agent must be EXHAUSTIVE — the goal is to find everything a thorough human researcher would find.
 
 **Professional Platforms**:
-- GitHub: contribution graph, repo quality, languages, stars, open-source involvement
-- Stack Overflow: reputation, top tags, answer quality
+- GitHub: contribution graph, repo quality, languages, stars, open-source involvement, org memberships
+- Stack Overflow: reputation, top tags, answer quality, questions asked
 - LinkedIn: recommendations, endorsements, activity, post quality
 - Personal website/blog: content depth, writing quality, topics, update frequency
 
@@ -150,26 +184,166 @@ Research the candidate's public digital presence.
 - Forum participation (Hacker News, relevant subreddits, Discord servers)
 - Mailing list archives (for open-source contributors)
 
-**Package/Project Registries**:
-- npm, PyPI, crates.io, Maven Central (depending on tech stack)
-- Docker Hub
-- Garmin Connect IQ Store, App Store, Play Store (if applicable)
+#### Project-by-Project Cross-Platform Sweep
 
-**Reddit Search Protocol** (learned from live testing):
-- Use PLAIN KEYWORDS, not exact-match quotes — `rkd telemetry extractor site:reddit.com` works, `"rkd-telemetry-extractor" site:reddit.com` often doesn't
-- Search for PROJECT NAMES, not person names
-- One Reddit post → username → full post/comment history → interests, tone, expertise areas
-- Check r/[relevant-subreddits] for domain-specific activity
+For EVERY project/repo discovered in Phase 1.5 or during research (not just the person's name), systematically search:
 
-**Profile Linking Ethics**:
+1. **Reddit** (see detailed protocol below)
+2. **Hacker News**: `[project name] site:news.ycombinator.com`, also search for "Show HN" posts
+3. **Stack Overflow**: project name, error messages, API questions — `[project-name] site:stackoverflow.com`
+4. **Dev.to, Medium, Hashnode**: `[project name] site:dev.to`, `[project name] site:medium.com`
+5. **YouTube**: demos, talks, tutorials — `[project name] site:youtube.com`
+6. **Twitter/X**: `[project name] site:twitter.com` or `site:x.com`
+7. **Domain-specific forums**: Match project domain to relevant communities:
+   - Running/fitness apps → r/running, r/AdvancedRunning, r/Garmin, r/Stryd, Garmin forums
+   - DevOps/Cloud tools → r/devops, r/aws, r/kubernetes, r/terraform, HashiCorp Discuss
+   - Programming tools → r/golang, r/python, r/programming, relevant language forums
+   - The candidate's hobby/interest subreddits based on profile signals
 
-| Mode | Rule |
-|------|------|
-| **Self-Assessment (Basic)** | Use only profiles that are publicly linked under the candidate's real name. No pseudonym linking at this tier. |
-| **Self-Assessment (Enhanced)** | Full linking allowed ONLY AFTER passing the identity verification gate (see Step 0). Follow breadcrumb chains (e.g., GitHub project mentioned on Reddit → Reddit username → post history). If verification fails, do NOT reveal what was found. |
-| **Evaluating Others** | ONLY use profiles that are **publicly and explicitly linked by the candidate themselves**. If GitHub profile says "John Smith" and a Reddit user "xXcoder99Xx" posted about the same project but there's no public link between them → **DO NOT CONNECT THEM**. The candidate chose to keep those identities separate. Respect that. NEVER attempt to link. NEVER trigger the verification gate — it does not apply in this mode. |
+#### Reddit Deep Search Protocol
 
-**Absence of signal is NOT negative signal.** Many excellent engineers have minimal online presence. Not having a blog, GitHub contributions, or Stack Overflow reputation says nothing about competence. Note the absence without judgment.
+Reddit's search is notoriously poor. Web search indexing of Reddit is also unreliable. You MUST try ALL of these query patterns for each project/identifier:
+
+1. **Plain project name**: `[project-name] site:reddit.com`
+2. **Project name without hyphens**: `[project name words separated] site:reddit.com`
+3. **Project URL**: `github.com/[username]/[project-name] site:reddit.com`
+4. **Project name + domain keyword**: `[project-name] [domain-keyword] site:reddit.com`
+5. **Project name without site filter**: `[project-name] reddit` (sometimes works better)
+6. **Username + reddit**: `[github-username] site:reddit.com`
+7. **Domain-specific subreddit search**: `[project concept] site:reddit.com/r/[relevant-subreddit]`
+
+**When you find ONE Reddit post by the candidate**:
+1. Extract the Reddit username
+2. Search for that username's full post and comment history: `author:[username] site:reddit.com` or `site:reddit.com/user/[username]`
+3. Scan their history for: other projects mentioned, expertise signals, tone/personality, interests, community involvement
+4. Check if they moderate any subreddits
+5. Look for AMAs, detailed technical comments, or help given to others
+
+**Do NOT give up after 1-2 failed queries.** Try at least 5 different formulations before concluding no Reddit presence exists. Log which queries you tried.
+
+#### Stack Overflow Deep Search
+
+1. Search by display name: `user:[name] site:stackoverflow.com`
+2. Search by project name: `[project-name] site:stackoverflow.com`
+3. Search by GitHub username — SO profiles often link to GitHub
+4. Check for questions ASKED (reveals learning areas) and answers GIVEN (reveals expertise)
+5. Check tags the user is active in
+6. Look for self-answered questions (often document solutions to hard problems they encountered)
+
+#### Credential Verification Protocol (licensed professions)
+
+For candidates in regulated professions (legal, medical, real estate, engineering, accounting, trades), always verify through the authoritative public databases:
+- State bar associations (every state has public lawyer lookup)
+- State medical boards + NPI Registry (npiregistry.cms.hhs.gov)
+- FINRA BrokerCheck (brokercheck.finra.org) for finance
+- CPA state board verification (every state)
+- CFA Institute verification (cfainstitute.org)
+- State real estate commissions
+- PE state board lookup
+
+#### Publication/Byline Protocol (writing, journalism, academic)
+
+- Google News: `"First Last" inurl:author` or `"By First Last" site:[publication]`
+- Google Scholar: citation counts, h-index, co-author network
+- Muck Rack: journalist profile aggregator
+- Amazon: authored books
+- SSRN: working papers (legal, finance, social science)
+
+#### Business Records Protocol (executive, founder, finance)
+
+- SEC EDGAR: search for name in proxy filings (DEF 14A), 10-K, 8-K
+- Crunchbase / PitchBook: funding rounds, company data
+- State Secretary of State: business entity search (incorporation records)
+- USPTO: patent and trademark filings
+- ProPublica Nonprofit Explorer: 990 filings listing officers and compensation
+
+#### Creative Portfolio Protocol (design, arts, video, music)
+
+- Search the domain-appropriate portfolio platforms from the Domain-Adaptive table
+- Look for awards (Cannes Lions, Webby, Effie, Oscars, Emmy, Grammy, Pulitzer — all have public winner/nominee databases)
+- IMDb for film/TV credits, Discogs for music credits
+- Festival selection databases (FilmFreeway)
+
+#### Low-OSINT Domain Protocol (sales, HR, consulting, supply chain, PM)
+
+When the domain classification indicates a Tier 3 (low OSINT) domain:
+- Don't waste 40+ searches on platforms that won't have artifacts — shift effort to credential verification and LinkedIn deep analysis
+- Focus on: certifiable credentials (PMP, SHRM, Salesforce certs, Six Sigma), LinkedIn recommendations (read the actual text for specificity and credibility), conference speaking history, published thought leadership
+- Explicitly note in the output: "This domain has low public artifact visibility. Assessment is weighted toward credential verification, peer endorsements, and company context rather than independent artifact discovery."
+
+#### Evidence Source Refinement Pass
+
+Before searching registries, determine which ones are relevant based on the candidate's profile. Don't blindly search every registry — identify the RIGHT registries for THIS person.
+
+**Step 1: Identify the candidate's domain bucket(s)** from Phase 1 data and domain classification. A candidate may span multiple buckets.
+
+**Technical:**
+- Software Engineering → code registries (npm, PyPI, crates.io, Docker Hub, etc.)
+- Data Science / ML → model hubs (Hugging Face), competition platforms (Kaggle), data registries
+- DevOps / Platform → infra registries (Terraform Registry, Ansible Galaxy, Helm/artifacthub.io, Docker Hub)
+- Security / InfoSec → vulnerability databases, CTF platforms (CTFtime, HackerOne, Bugcrowd)
+- Mobile Development → app stores (App Store, Play Store, Garmin Connect IQ)
+- Design / UX → portfolio platforms (Dribbble, Behance, Figma Community)
+- Hardware / Embedded → electronics communities, maker platforms
+
+**Business & Finance:**
+- Sales / Business Development → LinkedIn recommendations, President's Club mentions, Salesforce Trailblazer profiles, conference talks (SaaStr, Dreamforce)
+- Marketing / Growth → published campaigns (Cannes Lions, Effie, Webby, Shorty Awards), Google/HubSpot/Meta certifications (Credly), Substack/Medium articles
+- Finance / Accounting → FINRA BrokerCheck (public), CPA state board lookup (public), CFA Institute verification (public), SEC EDGAR, Seeking Alpha
+- Consulting / Strategy → firm alumni pages, published thought leadership, PMP (PMI registry), books (Amazon)
+- Entrepreneurship / Founder → Crunchbase, AngelList/Wellfound, state SOS business registrations, USPTO patents/trademarks, Product Hunt launches
+- Executive / C-Suite → SEC EDGAR proxy filings (DEF 14A), board memberships, ProPublica Nonprofit Explorer (990s), Bloomberg Executive Profile
+
+**Creative & Media:**
+- Journalism / Writing → Muck Rack, Google News byline search, Amazon (books), Substack, publication archives
+- Visual Arts / Illustration / Photography → ArtStation, DeviantArt, Behance, 500px, Getty/Shutterstock contributor profiles
+- Video / Film → IMDb, Vimeo, FilmFreeway, festival archives
+- Music / Audio → Discogs, ASCAP/BMI repertoire search, Spotify/Bandcamp/SoundCloud
+
+**Licensed Professions:**
+- Legal → state bar directories (public lookup), PACER/CourtListener, Google Scholar (legal opinions), Justia, Avvo
+- Healthcare → NPI Registry (public), state medical board lookup, ABMS certification verify (certificationmatters.org), PubMed, ClinicalTrials.gov
+- Architecture → state licensing boards, NCARB verification, ArchDaily, Dezeen
+- Engineering (PE) → state PE board lookup, USPTO patents, NCEES registry
+- Real Estate → state real estate commission lookup, Zillow/Redfin agent profiles, county deed records
+
+**Operations & Organizational:**
+- HR / People Ops → SHRM/HRCI certification verification, conference speaker archives
+- Non-Profit → ProPublica Nonprofit Explorer (IRS 990 filings — lists officers, directors, compensation), GuideStar/Candid, state charity registrations
+- Government / Policy → government websites, think tank publications, LegiStorm (legislative staff), GovTrack
+- Academic / Research → publication databases (Google Scholar, ORCID, DBLP, Semantic Scholar, arXiv)
+- Project Management → PMP (PMI), CSM (ScrumAlliance), SAFe (Scaled Agile)
+
+**OSINT Searchability Tiers** — calibrate depth of artifact search accordingly:
+- **Tier 1 (HIGH)**: Software eng, data science, legal, healthcare, finance credentials, entrepreneurship, journalism, real estate, non-profit leadership, public company executives → Rich public data, go deep
+- **Tier 2 (MEDIUM)**: DevOps, security, design, academia, visual arts, video/film, architecture, government → Some public signals but gaps; mix artifact search with credential verification
+- **Tier 3 (LOW)**: Sales, marketing, consulting, HR, supply chain, project management, customer success → Most work is proprietary; focus on credential verification, LinkedIn recommendation analysis, and conference speaking history. Explicitly acknowledge the limitation in the output.
+
+**Step 2: For EACH identified domain**, search the relevant registries for the candidate's username, real name, and known project names.
+
+**Step 3: Check for cross-domain registries** that apply broadly:
+- LinkedIn (universal)
+- GitHub/GitLab (nearly universal for technical roles)
+- Google Scholar (academic, research, healthcare, legal scholarship)
+- Crunchbase (entrepreneurship, executive, finance)
+- USPTO (patents across all domains)
+
+Publishing to any registry or platform is a strong signal — it requires packaging, documentation, and maintenance discipline beyond just writing code. A published Terraform provider signals deep Go + IaC knowledge. A Kaggle competition ranking signals applied ML skills. A Google Scholar profile with citations signals research impact. A verified state bar listing confirms legal practice. A FINRA BrokerCheck entry confirms financial licensing.
+
+#### Link Classification & Ethics
+
+| Link Type | Definition | Example | Evaluating Others | Self-Assessment Basic | Self-Assessment Enhanced |
+|-----------|-----------|---------|-------------------|----------------------|------------------------|
+| **Explicit** | Candidate publicly links Profile A to Profile B | GitHub bio says "Also on Twitter @handle" | ✅ USE | ✅ USE | ✅ USE |
+| **Implicit (Strong)** | Same unique project appears on both platforms with matching technical detail | GitHub repo `foo-tool` + Reddit post "I built foo-tool" with implementation details only the author would know | ❌ IGNORE | ❌ IGNORE | ✅ USE after verification gate |
+| **Implicit (Weak)** | Same common name, overlapping interests, but no unique identifier | LinkedIn "John Smith, Python dev" + SO user "john_s" answering Python questions | ❌ IGNORE | ❌ IGNORE | ⚠️ Flag for verification but low confidence |
+| **Circumstantial** | Timing correlation, geographic match, but no content link | Reddit account created same month as a job change | ❌ IGNORE | ❌ IGNORE | ❌ IGNORE (not enough signal) |
+
+**For Evaluating Others**: Only explicit links. Period. If you can't trace a public, candidate-created link between two profiles, they are separate identities. This is not optional.
+
+**For Self-Assessment Enhanced**: Find ALL implicit links. For each one, run the identity verification gate BEFORE including it. Batch verifications when possible — "I found potential accounts on Reddit and Stack Overflow. Let me verify both."
+
+**Absence of signal is NOT negative signal.** Many excellent professionals have minimal online presence. Not having a blog, GitHub contributions, or public portfolio says nothing about competence. Note the absence without judgment.
 
 ### Agent B: Claim Verification
 
@@ -186,11 +360,60 @@ Verify specific claims from the CV or profile:
 - Timeline consistency — do dates make sense? Any unexplained gaps?
 - Responsibility claims — are the claimed achievements plausible for the role and company size?
 
-**Technical Claims**:
-- If they claim expertise in X, does their GitHub/open-source work reflect it?
+**Professional Claims — Artifact Verification**:
+- If they claim expertise in X, does their public work (repos, publications, portfolios, registry entries) reflect it?
 - If they claim to have built Y, can you find evidence of Y existing?
 - Patent searches (Google Patents, USPTO) for claimed inventions
 - Published papers (Google Scholar, arXiv) for claimed research
+- License/credential verification through authoritative public databases
+
+For each claimed skill, search for published artifacts that prove it. The artifact type depends on the domain:
+
+**Engineering/DevOps examples**:
+- Claimed Go expertise → Go repos, Terraform providers (written in Go), CLI tools
+- Claimed Python expertise → PyPI packages, GitHub repos with Python code
+- Claimed K8s expertise → Helm charts, operators, CRDs in their repos
+- Claimed Terraform expertise → Terraform Registry modules/providers
+- Claimed AWS expertise → CDK constructs, CloudFormation templates, published solutions
+
+**Research/Academic examples**:
+- Claimed expertise in a field → published papers, citation counts, h-index
+- Claimed novel methodology → pre-prints, conference presentations, invited talks
+- Claimed research impact → Google Scholar profile, citation network, grants
+
+**Design/Product examples**:
+- Claimed UX expertise → portfolio case studies, shipped products, Dribbble/Behance work
+- Claimed product leadership → product launches, blog posts about decisions, speaking engagements
+
+**Business/Leadership examples**:
+- Claimed revenue growth → verify company trajectory via Crunchbase funding, press coverage, Glassdoor headcount trends
+- Claimed board membership → verify via SEC proxy filings (public companies) or IRS 990 filings (non-profits)
+- Claimed company founding → verify via state SOS business entity search, Crunchbase, AngelList
+- Claimed patent → verify via Google Patents or USPTO TESS
+
+**Licensed profession examples**:
+- Claimed bar admission → verify via state bar public directory (every state has one)
+- Claimed medical license → verify via state medical board + NPI Registry
+- Claimed CPA/CFA → verify via state board / CFA Institute directory
+- Claimed PE license → verify via state board / NCEES
+
+**Creative examples**:
+- Claimed publication byline → verify via publication archive, Google News
+- Claimed film credit → verify via IMDb
+- Claimed music credit → verify via Discogs, ASCAP/BMI repertoire database
+- Claimed award → verify via the award organization's public archive
+
+**General principle**: For each claimed skill, look for ARTIFACTS, not just mentions:
+- Published work in that domain's natural registry/platform
+- Contributions (PRs, issues, discussions, reviews, comments) to projects in that ecosystem
+- Conference talks, blog posts, or teaching materials demonstrating depth
+- Third-party references or citations of their work
+
+Also check:
+- The candidate's GitHub org memberships — some contributions are under org accounts
+- Git commit history in their repos for co-authors and contribution patterns
+- Forked repos with significant modifications (indicates learning or contribution intent)
+- For non-technical candidates: company "About"/"Team" pages, conference speaker archives, professional association member directories, and any publications or awards databases relevant to their domain
 
 **Education Verification**:
 - Institution exists and offers the claimed program
@@ -210,8 +433,8 @@ Understand the context around each employer:
 
 - **Company trajectory**: Was it growing, stable, or declining during the candidate's tenure?
 - **Industry context**: What was happening in their industry? (e.g., crypto winter, AI boom, COVID pivot)
-- **Team size and structure**: How big was the engineering team? What was the candidate's scope?
-- **Technology choices**: What stack did the company use? Does it align with the candidate's claimed skills?
+- **Team size and structure**: How big was the candidate's team/department? What was their scope?
+- **Tools and methods**: What tools, technologies, or methodologies did the company use? Does it align with the candidate's claimed skills?
 - **Exits and outcomes**: Did the company IPO, get acquired, shut down? This contextualizes the candidate's experience.
 
 This context matters because "Senior Engineer at [company]" means very different things depending on whether the company had 5 or 5000 engineers.
@@ -234,7 +457,35 @@ Look for indirect reputation signals:
 | **Tier 1 (Strong)** | Published talks at known conferences, merged PRs to major projects, peer-reviewed papers, patents | High confidence signal |
 | **Tier 2 (Moderate)** | Blog posts with technical depth, Stack Overflow reputation, LinkedIn recommendations from credible people, GitHub repos with real users | Medium confidence signal |
 | **Tier 3 (Contextual)** | Social media activity, community participation, forum posts, casual mentions | Low confidence — useful for personality/culture fit, not technical ability |
-| **Meta-signal** | Absence of any online presence | NOT negative. Many excellent engineers are private. Note it neutrally. |
+| **Meta-signal** | Absence of any online presence | NOT negative. Many excellent professionals are private. Note it neutrally. |
+
+---
+
+## Phase 2.5: Cross-Platform Correlation Pass
+
+After all 4 agents complete, compile their Discovered Identifiers sections and run a FINAL correlation pass:
+
+1. **Username propagation**: For every username found on any platform, search for that SAME username on all OTHER platforms:
+   - GitHub username → search Reddit, SO, HN, Twitter, Docker Hub, PyPI, npm, etc.
+   - Reddit username → search GitHub, SO, Twitter, etc.
+   - This catches cases where someone uses the same handle everywhere
+
+2. **Project propagation**: For every project found anywhere, search for it on ALL platforms:
+   - GitHub repo → search Reddit, HN, SO, blog posts, YouTube demos, forum discussions
+   - PyPI package → search GitHub (source), SO (usage questions), Reddit (announcements)
+   - Published app → search app reviews, forum discussions, Reddit threads
+
+3. **Implicit link detection** (Self-Assessment Enhanced only):
+   - Compare identifiers across platforms for matches
+   - Same project name + matching technical detail = strong implicit link → trigger verification gate
+   - Same username across platforms = strong implicit link → trigger verification gate
+   - Flag all potential connections for verification
+
+4. **Evidence strengthening**: Use cross-platform findings to upgrade evidence levels:
+   - A skill rated "Weak" based on GitHub alone might become "Moderate" if a SO answer or Reddit discussion demonstrates depth
+   - A skill rated "Moderate" might become "Strong" if a published registry artifact confirms it
+
+**For Evaluating Others mode**: Skip step 3 (no implicit linking). Only use explicit links found in steps 1-2.
 
 ---
 
@@ -250,19 +501,33 @@ Compile all research into a structured assessment.
 - What's the overall signal quality? (strong evidence, moderate, or mostly self-reported?)
 - Initial hiring thesis: what role would this person excel in? What role would be a poor fit?
 
-### 3.2 Technical Depth Assessment
+### 3.2 Professional Depth Assessment
 
-| Domain | Claimed Level | Evidence Level | Confidence | Notes |
-|--------|--------------|----------------|------------|-------|
-| [Skill 1] | Expert | Strong GitHub evidence | High | [specifics] |
-| [Skill 2] | Advanced | No public evidence | Low | Self-reported only |
-| [Skill 3] | Intermediate | Conference talk found | Medium | [specifics] |
+For each claimed area of expertise, provide a comprehensive evidence map:
+
+| Domain | Claimed Level | Evidence Level | Confidence | Key Evidence |
+|--------|--------------|----------------|------------|-------------|
+| [Skill 1] | Expert | Very Strong | High | [List SPECIFIC artifacts: repo URLs, package links, SO answers, registry entries, PR links] |
+| [Skill 2] | Advanced | Weak | Low | Self-reported only. Searched relevant registries and platforms — no artifacts found. |
+| [Skill 3] | Intermediate | Moderate | Medium | [Specific artifact links and descriptions] |
+| [Skill 4] | Licensed | Verified | High | State bar #12345 — active status confirmed via public directory |
 
 **Evidence Levels**:
-- **Strong**: Multiple independent sources confirm (code, talks, papers, peer endorsements)
+- **Very Strong**: 3+ independent sources confirm (code + published artifact + third-party endorsement + community activity)
+- **Strong**: 2+ independent sources confirm (code + peer endorsement, or artifact + community discussion)
 - **Moderate**: Some evidence supports (one project, one reference, consistent narrative)
-- **Weak**: Self-reported only, no corroboration
+- **Weak**: Self-reported only, no corroboration found despite searching
 - **Contradictory**: Evidence suggests different level than claimed
+
+**For each domain rated Moderate or below**: Explicitly list what you searched for and didn't find. "Searched PyPI, Terraform Registry, Docker Hub, and GitHub repos — no Go artifacts found" is more useful than "No public evidence."
+
+**Artifact inventory**: For every area of expertise, list the discovered artifacts (adapt to the candidate's field):
+- **Code/Technical**: Repos, published packages, registry entries, SO activity
+- **Publications**: Papers, articles, bylines, books, patents
+- **Credentials**: Verified licenses, certifications, board memberships
+- **Portfolio**: Case studies, shipped products, published designs, produced media
+- **Community**: Conference talks, forum posts, recommendations, endorsements
+- **Recognition**: Awards, rankings, citations, grants
 
 ### 3.3 Mentality Profile
 
@@ -344,7 +609,7 @@ Generate 10-15 interview questions specifically tailored to THIS candidate. Not 
 - 3-4 questions to **verify specific claims** from CV
 - 2-3 questions to **probe identified gaps** or concerns
 - 2-3 questions to **assess mentality dimensions** relevant to the role
-- 2-3 questions to **test technical depth** in claimed areas
+- 2-3 questions to **test professional depth** in claimed areas of expertise
 - 1-2 questions to **assess culture fit** based on observed communication style
 
 ---
@@ -374,7 +639,7 @@ Generate 10-15 interview questions specifically tailored to THIS candidate. Not 
 - Do not penalize career gaps (they could be anything: caregiving, health, travel, sabbatical)
 - Do not assume prestige of company = quality of candidate
 - Do not assume a non-traditional path is inferior to a traditional one
-- Do not assume GitHub activity = engineering quality (many excellent engineers work on proprietary code)
+- Do not assume online activity = professional quality (many excellent professionals work on proprietary or confidential matters)
 
 ### Do NOT doxx
 - In "Evaluating Others" mode, NEVER attempt to link pseudonymous accounts
@@ -393,12 +658,20 @@ Generate 10-15 interview questions specifically tailored to THIS candidate. Not 
 | Find LinkedIn | `"First Last" site:linkedin.com [job title]` | Most reliable starting point |
 | Find GitHub | `"First Last" site:github.com` or search GitHub directly | Check contributions, not just repos |
 | Find Reddit activity | `[project name] site:reddit.com` (NO quotes on project name) | Plain keywords work better than exact match |
+| Find Stack Overflow | `[username] site:stackoverflow.com` AND `[project-name] site:stackoverflow.com` | Search BOTH by name and by project |
+| Find Terraform artifacts | `[username] site:registry.terraform.io` AND search GitHub for `terraform-provider-*` repos | Strong Go + IaC signal |
+| Find Docker images | `[username] site:hub.docker.com` | Check image descriptions for links |
+| Find HN activity | `[project name] site:news.ycombinator.com` | Also search for "Show HN" posts |
+| Find forum posts | `[project name] [technology] forum` | Try technology-specific forums |
+| Cross-platform username | `"[username]" -site:[known-platform]` | Exclude known platforms to find new ones |
 | Find talks/presentations | `"First Last" [topic] site:youtube.com OR site:slideshare.net` | Also check conference websites directly |
 | Find publications | `"First Last" site:scholar.google.com` or `"First Last" arxiv` | For research-oriented candidates |
+| Find academic profile | `"First Last" site:researchgate.net OR site:orcid.org` | Check citation counts, h-index |
 | Find packages | Search npm/PyPI/crates.io directly for username | Often matches GitHub handle |
 | Find patent filings | `"First Last" site:patents.google.com` | For senior/inventive roles |
 | Verify company claims | `"[Company Name]" crunchbase OR glassdoor OR linkedin` | Cross-reference size, funding, status |
 | Find archived content | `"First Last" site:web.archive.org` | For deleted blogs/sites |
+| Find design work | `"First Last" site:dribbble.com OR site:behance.net` | For design-oriented candidates |
 
 ### Search Tips (Learned from Live Testing)
 - Plain keywords consistently outperform exact-match quoted strings for Reddit
@@ -407,9 +680,75 @@ Generate 10-15 interview questions specifically tailored to THIS candidate. Not 
 - Conference speaker pages often have bios with links to other profiles
 - Git commit emails can sometimes be found in public repos (ethically: only if the repo is public)
 - Company "About" or "Team" pages often have richer bios than LinkedIn
+- Try at least 5 different query formulations per platform before concluding no presence exists
+- When one query finds a username, immediately pivot to searching that username across all other platforms
+- Search for project names WITH and WITHOUT hyphens/separators — `rkd-telemetry-extractor` vs `rkd telemetry extractor`
 
 ### Platform-Specific Notes
-- **Reddit**: Web search tools have poor Reddit indexing. Try multiple query formulations. If web search fails, note it as a limitation rather than concluding no Reddit presence exists.
-- **GitHub**: Stars and followers are vanity metrics. Look at: contribution frequency, code quality in repos, PR review comments, issue discussions.
-- **LinkedIn**: Recommendations from senior people carry more weight. Look at WHO recommends them, not just how many recommendations.
-- **Stack Overflow**: Look at the questions they ask, not just answers. Someone asking good questions in advanced topics signals genuine learning depth.
+
+**Reddit**:
+- Web search tools have poor Reddit indexing. Try multiple query formulations.
+- If web search fails, note it as a limitation rather than concluding no Reddit presence exists.
+- Try: plain project name, project name without hyphens, project URL, project + domain keyword, username + reddit, domain-specific subreddit searches.
+- When you find a post, extract the username and search their full history.
+
+**GitHub**:
+- Stars and followers are vanity metrics. Look at: contribution frequency, code quality in repos, PR review comments, issue discussions.
+- Check org memberships — contributions may be under org accounts.
+- Look at the language breakdown across repos for a true skill map.
+- Check for Terraform providers (`terraform-provider-*` repos) — these are written in Go and signal deep IaC knowledge.
+
+**Stack Overflow**:
+- Look at the questions they ask, not just answers. Someone asking good questions in advanced topics signals genuine learning depth.
+- Check tags the user is active in — this reveals their actual expertise areas vs. claimed ones.
+- Self-answered questions often document solutions to hard problems.
+
+**LinkedIn**:
+- Recommendations from senior people carry more weight. Look at WHO recommends them, not just how many recommendations.
+- Check activity feed for posts and comments — reveals communication style and thought leadership.
+
+**Terraform Registry**:
+- Search for the candidate's GitHub username/org.
+- Published providers require deep Go AND Terraform knowledge — this is a very strong signal.
+- Published modules indicate IaC maturity.
+
+**Academic/Research Platforms** (Google Scholar, ResearchGate, ORCID, Semantic Scholar):
+- Check citation counts and h-index for research impact.
+- Look for co-authors — reveals collaboration networks.
+- Check if papers are in high-impact venues (top-tier conferences, high-IF journals).
+- Pre-prints on arXiv/bioRxiv signal active research engagement.
+
+### Domain-Adaptive Search
+
+The platforms and registries to search depend on the candidate's professional domain. Adapt your search strategy:
+
+| Domain | Primary Artifact Sources | Key Registries/Databases | Community Platforms | OSINT Quality |
+|--------|------------------------|-------------------------|--------------------|----|
+| **Software Engineering** | GitHub, GitLab | npm, PyPI, crates.io, Docker Hub, Terraform Registry | SO, HN, Reddit, Dev.to | HIGH |
+| **Data Science / ML** | GitHub, Kaggle, Hugging Face | PyPI, conda-forge, HF Hub | Kaggle, Papers with Code, r/MachineLearning | HIGH |
+| **DevOps / Platform** | GitHub | Docker Hub, Terraform Registry, artifacthub.io, Ansible Galaxy | r/devops, HashiCorp Discuss, CNCF Slack | HIGH |
+| **Security / InfoSec** | GitHub, CTF profiles | — | HackerOne, Bugcrowd, CTFtime, r/netsec | MEDIUM |
+| **Mobile Development** | GitHub | App Store, Play Store, Garmin Connect IQ | r/iOSProgramming, r/androiddev | HIGH |
+| **Design / UX** | Dribbble, Behance, Figma Community | — | Designer News, r/design, ADPList | MEDIUM |
+| **Academic / Research** | Google Scholar, ORCID, DBLP | arXiv, bioRxiv, Semantic Scholar | ResearchGate, academic Twitter | HIGH |
+| **Journalism / Writing** | Muck Rack, Google News, Amazon | — | Twitter/X, r/journalism, SPJ | HIGH |
+| **Visual Arts / Photography** | ArtStation, Behance, 500px | Getty/Shutterstock contributor | r/Art, r/photography | MEDIUM |
+| **Video / Film** | IMDb, Vimeo, YouTube | FilmFreeway | r/Filmmakers, No Film School, Stage 32 | MEDIUM |
+| **Music / Audio** | Discogs, Spotify, Bandcamp | ASCAP/BMI repertoire | r/WeAreTheMusicMakers, Gearspace | MEDIUM |
+| **Sales / Business Dev** | LinkedIn | Salesforce Trailblazer (trailblazer.me) | r/sales, Pavilion, Sales Hacker | LOW |
+| **Marketing / Growth** | LinkedIn, Substack, Medium | Google/HubSpot/Meta certs (Credly) | r/marketing, GrowthHackers | LOW |
+| **Finance / Accounting** | SEC EDGAR, Seeking Alpha | FINRA BrokerCheck, CPA state boards, CFA verify | Wall Street Oasis, r/FinancialCareers | HIGH (credentials) |
+| **Legal** | PACER/CourtListener, Google Scholar | State bar directories, Martindale-Hubbell | Above the Law, JD Supra, r/Lawyers | HIGH |
+| **Healthcare** | PubMed, ClinicalTrials.gov | NPI Registry, state medical boards, ABMS verify | Doximity, r/medicine, KevinMD | HIGH |
+| **Entrepreneurship / Founder** | Crunchbase, AngelList, Product Hunt | State SOS, USPTO, SEC EDGAR | Indie Hackers, HN, r/startups | HIGH |
+| **Executive / C-Suite** | SEC EDGAR (proxy), Bloomberg | ProPublica Nonprofit Explorer (990s) | — | HIGH (public co) / LOW (private) |
+| **Architecture** | ArchDaily, Dezeen | State licensing boards, NCARB | Archinect, r/architecture | MEDIUM |
+| **Engineering (PE)** | USPTO patents | State PE boards, NCEES | eng-tips.com, r/engineering | HIGH (credentials) |
+| **Real Estate** | Zillow/Redfin agent profiles | State RE commissions, county deed records | BiggerPockets, r/RealEstate | HIGH |
+| **Non-Profit** | ProPublica Nonprofit Explorer | GuideStar/Candid, state charity registrations | SSIR, Chronicle of Philanthropy | MEDIUM-HIGH |
+| **Government / Policy** | Government sites, think tanks | LegiStorm, GovTrack | r/PublicPolicy, GovLoop | MEDIUM |
+| **HR / People Ops** | LinkedIn | SHRM/HRCI cert verification | r/humanresources, SHRM Connect | LOW |
+| **Consulting** | LinkedIn, firm bio pages | PMP (PMI registry), CMC directory | r/consulting, Fishbowl | LOW |
+| **Project Management** | LinkedIn | PMP (PMI), CSM (ScrumAlliance), SAFe (Scaled Agile) | r/projectmanagement | LOW |
+
+Don't limit yourself to this table — it's a starting point. If the candidate works in a niche domain, search for domain-specific communities and registries.
