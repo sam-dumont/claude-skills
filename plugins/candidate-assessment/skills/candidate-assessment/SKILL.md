@@ -155,17 +155,40 @@ This seed list is the foundation for cross-platform research. Every identifier g
 
 Launch 4 research agents in parallel. Each has a specific focus area. Pass the full seed list from Phase 1.5 to every agent.
 
-**CRITICAL — NO INTERMEDIATE REPORTS**: Do NOT produce any assessment, summary, or partial report until ALL 4 agents have completed AND Phase 2.5 (Cross-Platform Correlation) is finished. Wait for every agent to return before writing anything. The user must receive ONE single, definitive report — never an initial report followed by addendums or updates. If some agents finish before others, wait silently for the remaining agents. Do not narrate agent completions to the user (e.g., "Agent A is done, here's what it found..."). The first output the user sees should be the complete Phase 3 synthesis.
+**CRITICAL — NO INTERMEDIATE REPORTS, NO POST-REPORT COMMENTARY**:
+
+The user receives exactly ONE output from this entire skill: the final synthesized report from the synthesis agent in Phase 3. Nothing before it, nothing after it (except the identity verification questions in Phase 2.5 if applicable).
+
+Specifically, you must NOT:
+- Narrate agent completions ("Agent A is done", "Agent C completed", "all 4 agents finished")
+- Produce partial assessments as agents return
+- Write recap summaries after the report is delivered
+- Add "one more thing" or "small correction" addendums when late agents finish
+- Show research statistics tables (search counts, tool calls, duration)
+- Provide "actionable takeaways" or commentary after the report
+
+**How to handle agent completions**: Do NOT run agents in background. Launch all 4 agents and wait for all to return. Then proceed to Phase 2.5 (verification gates) and Phase 2.75 (synthesis agent). Once the synthesis agent returns the final report, relay it to the user and STOP. The assessment is complete. Say nothing more unless the user asks a follow-up question.
 
 **Thoroughness calibration**: A thorough assessment should perform 40-60+ web searches per agent. If an agent completes with fewer than 20 searches, it likely didn't go deep enough. Each project, username, and company name should be searched across multiple platforms. Each claimed skill should be verified through at least 2-3 different search angles. Don't be satisfied with the first result — dig into second and third pages of results, try alternative query formulations, and follow every promising lead.
 
-**Critical instruction for ALL agents**: At the end of your research, output a **Discovered Identifiers** section listing:
+**Critical instruction for ALL agents**: You MUST end your output with two structured sections:
+
+**Section 1 — Discovered Identifiers**:
 - All usernames/handles found (platform: username)
 - All project names found with URLs
 - All email addresses found
 - Any other unique identifiers
 
-These will be cross-referenced by the synthesizing agent after all 4 agents complete. The synthesis phase will use identifiers from ALL agents to run a final cross-platform correlation pass.
+**Section 2 — Agent Digest** (MANDATORY — this is what the synthesis agent reads):
+
+Produce a structured summary of ALL your findings. This digest must be self-contained — a reader who sees ONLY this digest should understand everything you found. Include:
+- Every factual finding with its source URL
+- Every evidence rating (Strong/Moderate/Weak/None) with justification
+- Every concern, gap, or notable observation
+- Specific quotes or data points that matter (don't just say "active GitHub" — say "mass contributions in 2023, mass Go code, mass Terraform providers, 2.1k stars on project X")
+- Target length: 1500-3000 words. Err on the side of MORE detail, not less. The synthesis agent cannot go back and read your full output — if it's not in the digest, it's lost.
+
+These will be cross-referenced by a dedicated synthesis agent after all 4 agents complete. The synthesis agent operates with a fresh context window and reads ONLY the digests, so completeness is critical.
 
 **Depth over breadth**: Do not skim 20 platforms. Go DEEP on the platforms where you find signal. One Reddit username leading to 50 comments is worth more than checking 10 platforms and finding nothing. Follow every thread.
 
@@ -222,6 +245,29 @@ Reddit's search is notoriously poor. Web search indexing of Reddit is also unrel
 5. Look for AMAs, detailed technical comments, or help given to others
 
 **Do NOT give up after 1-2 failed queries.** Try at least 5 different formulations before concluding no Reddit presence exists. Log which queries you tried.
+
+#### Reddit Archive Fallback (when web search fails)
+
+Reddit actively blocks AI tools — both `site:reddit.com` web searches and direct WebFetch of Reddit URLs frequently return empty results or 403 errors. When standard Reddit searches fail, use these archive APIs via WebFetch which provide full post/comment history:
+
+**Primary: Arctic Shift API**
+- Search posts by author: `https://arctic-shift.photon-reddit.com/api/posts/search?author=[username]&limit=100`
+- Search comments by author: `https://arctic-shift.photon-reddit.com/api/comments/search?author=[username]&limit=100`
+- Search posts by keyword: `https://arctic-shift.photon-reddit.com/api/posts/search?q=[search-term]&limit=100`
+- Search posts in a subreddit: `https://arctic-shift.photon-reddit.com/api/posts/search?subreddit=[subreddit]&q=[search-term]&limit=100`
+
+**Secondary fallback: PullPush API** (if Arctic Shift is down)
+- Search posts by author: `https://api.pullpush.io/reddit/search/submission/?author=[username]&size=100`
+- Search comments by author: `https://api.pullpush.io/reddit/search/comment/?author=[username]&size=100`
+
+**Usage protocol**:
+1. Try standard web search queries first (the 7 patterns above)
+2. If web search returns no results or errors, immediately pivot to Arctic Shift API
+3. If you found a plausible Reddit username from another platform (e.g., same handle on GitHub, Last.fm, DeviantArt, Steam), search that username via Arctic Shift even if web search found nothing
+4. Use the keyword search to find posts mentioning the candidate's projects or unique identifiers
+5. **ALWAYS try the archive APIs for every known username/handle** — do not rely solely on web search for Reddit
+
+**Identity verification still applies**: Finding a Reddit account with a matching username does NOT confirm identity. Same username ≠ same person. In Self-Assessment Enhanced mode, still run the identity verification gate before linking. In Evaluating Others mode, only use if the candidate explicitly links their Reddit account from a known profile.
 
 #### Stack Overflow Deep Search
 
@@ -463,11 +509,69 @@ Look for indirect reputation signals:
 
 ---
 
-## Phase 2.5: Cross-Platform Correlation Pass
+## Phase 2.5: Identity Verification Gates (Main Agent — Self-Assessment Enhanced Only)
 
-**Prerequisite**: ALL 4 agents from Phase 2 must have returned their results before starting this phase. Do not begin correlation until every agent is done. Do not output anything to the user yet — this is still an internal research phase.
+**Prerequisite**: ALL 4 research agents from Phase 2 must have returned their results.
 
-After all 4 agents complete, compile their Discovered Identifiers sections and run a FINAL correlation pass:
+**Skip this phase entirely** in Evaluating Others mode and Self-Assessment Basic mode. Go directly to Phase 2.75.
+
+In Self-Assessment Enhanced mode, the MAIN agent must handle identity verification BEFORE launching the synthesis agent. This prevents pseudonymous account details from leaking into any output before verification.
+
+**Procedure**:
+
+1. **Read ONLY the Discovered Identifiers sections** from all 4 agents (these are short lists — they fit in context). Do NOT read the full agent outputs or digests yet.
+
+2. **Identify potential pseudonymous links**: Compare identifiers across agents. Look for:
+   - Same username appearing on multiple platforms without explicit cross-linking
+   - Same project name on platforms associated with different identities
+   - Usernames matching known handles on new, unexpected platforms
+
+3. **Run verification gates** for ALL potential links BEFORE proceeding:
+   - Batch verifications when possible ("I found potential accounts on Reddit, DeviantArt, and Steam. Let me verify each.")
+   - Follow the Identity Verification Gate protocol from Step 0 exactly: ask 2-3 challenge questions, do NOT reveal the full profile until verified
+   - **CRITICAL**: Do NOT list the discovered accounts, do NOT mention the platforms, do NOT show the correlation results. Only reveal enough to ask the verification question (e.g., "I found a potential account on [platform] that appears linked to one of your projects.")
+
+4. **Record results**: For each potential link, record: Verified ✅ or Rejected ❌. Rejected links are PERMANENTLY excluded — they must never appear in any subsequent output.
+
+5. **Pass verification results to the synthesis agent** in Phase 2.75.
+
+---
+
+## Phase 2.75 + Phase 3: Synthesis Agent (Dedicated Sub-Agent)
+
+**WHY a dedicated agent**: The 4 research agents produce massive outputs. The main agent's context is already partially consumed by Phases 0–2.5. Attempting to read all 4 full outputs in the main context leads to truncation and lost data. Instead, delegate ALL synthesis work to a fresh agent with a clean context window.
+
+**How to launch**: Once Phase 2.5 is complete (or skipped), launch ONE synthesis agent (using the Task tool) with the following:
+
+1. **Input**: Pass the synthesis agent ALL of the following in its prompt:
+   - The candidate's name, target role, and assessment mode (Self-Assessment / Evaluating Others)
+   - The structured profile from Phase 1
+   - The seed list from Phase 1.5
+   - The full Agent Digest sections from all 4 research agents (copy-paste the digest text — do NOT ask the synthesis agent to read files)
+   - The full Discovered Identifiers sections from all 4 research agents
+   - Identity verification results from Phase 2.5 (which links are verified ✅, which are rejected ❌). Instruct the synthesis agent: "Do NOT include any information from rejected links in the report. Treat rejected accounts as if they do not exist."
+
+2. **Instructions for the synthesis agent**: The synthesis agent must perform Phase 2.75 (Cross-Platform Correlation) AND Phase 3 (Final Report) as described below. Its output IS the final report shown to the user.
+
+**CRITICAL — NO INTERMEDIATE OUTPUT, NO POST-REPORT OUTPUT**: The main agent must NOT produce any text before or after the synthesis agent's report, except:
+- Identity verification questions (Phase 2.5, if applicable)
+- A brief "Starting assessment..." message at the very beginning
+
+Once the synthesis agent returns, relay its complete output to the user and STOP IMMEDIATELY. Do not:
+- Summarize the report ("Here's a quick summary of what 4 agents found...")
+- Add commentary ("The biggest finding is...")
+- Show agent statistics ("4 agents, 390+ tool calls, 200+ web searches...")
+- Provide post-report insights or takeaways
+- Respond to late-arriving agent completion notifications
+- Add corrections or clarifications from other agents
+
+The report is the deliverable. Everything else is noise.
+
+---
+
+### Phase 2.75: Cross-Platform Correlation (performed by synthesis agent)
+
+The synthesis agent runs a FINAL correlation pass using the Discovered Identifiers from all 4 research agents:
 
 1. **Username propagation**: For every username found on any platform, search for that SAME username on all OTHER platforms:
    - GitHub username → search Reddit, SO, HN, Twitter, Docker Hub, PyPI, npm, etc.
@@ -479,25 +583,19 @@ After all 4 agents complete, compile their Discovered Identifiers sections and r
    - PyPI package → search GitHub (source), SO (usage questions), Reddit (announcements)
    - Published app → search app reviews, forum discussions, Reddit threads
 
-3. **Implicit link detection** (Self-Assessment Enhanced only):
-   - Compare identifiers across platforms for matches
-   - Same project name + matching technical detail = strong implicit link → trigger verification gate
-   - Same username across platforms = strong implicit link → trigger verification gate
-   - Flag all potential connections for verification
+3. **Include only verified links**: In Self-Assessment Enhanced mode, only include accounts that passed the verification gate in Phase 2.5. Never mention, reference, or use data from rejected accounts.
 
 4. **Evidence strengthening**: Use cross-platform findings to upgrade evidence levels:
    - A skill rated "Weak" based on GitHub alone might become "Moderate" if a SO answer or Reddit discussion demonstrates depth
    - A skill rated "Moderate" might become "Strong" if a published registry artifact confirms it
 
-**For Evaluating Others mode**: Skip step 3 (no implicit linking). Only use explicit links found in steps 1-2.
+**For Evaluating Others mode**: Only use explicit links (candidate publicly links Profile A to Profile B). No implicit linking.
 
 ---
 
-## Phase 3: Synthesis & Output
+### Phase 3: Final Report (performed by synthesis agent)
 
-**MANDATORY**: Only begin this phase after ALL 4 research agents AND Phase 2.5 have fully completed. This report is the ONLY output the user receives — there are no drafts, previews, partial reports, or addendums. Produce one single, definitive, comprehensive assessment. If you have already started writing and new information arrives, do NOT append an addendum — rewrite the relevant sections to incorporate the new information seamlessly.
-
-Compile all research into a structured assessment.
+The synthesis agent compiles all research into one single, definitive, comprehensive assessment. This is the ONLY output the user receives — there are no drafts, previews, partial reports, or addendums.
 
 ### 3.1 Executive Summary
 
@@ -668,6 +766,7 @@ Many platforms block AI tool fetches (403 errors, JavaScript-only rendering, too
 | **Twitter/X** | JS wall | `syndication.twitter.com/srv/timeline-profile/screen-name/{username}` | Twitter's own SSR endpoint. Backup: `nitter.tiekoetter.com/{username}` or `twiiit.com/{username}` (auto-discovers working Nitter instances) |
 | **Stack Overflow** | Tool deny-list (all SO/SE domains) | WebSearch `"{name}" stackoverflow reputation answers` | Google snippets contain full metrics (rep, badges, tags). No direct access workaround exists. |
 | **npm** | 403 on website | `registry.npmjs.org/{package}` or `registry.npmjs.org/-/v1/search?text={query}&size=10` | JSON API returns full package metadata |
+| **Reddit** | Bot blocking (403/empty) | `arctic-shift.photon-reddit.com/api/posts/search?author={username}&limit=100` | Also: `/api/comments/search?author={username}&limit=100`, `/api/posts/search?q={keyword}&limit=100`. Fallback: `api.pullpush.io/reddit/search/submission/?author={username}&size=100` |
 | **Docker Hub** | JS SPA | `hub.docker.com/v2/repositories/{namespace}/{repo}/` | JSON API with pull counts, stars, tags |
 | **Terraform Registry** | JS wall | `registry.terraform.io/v1/providers/{namespace}/{name}` | JSON API with download counts, versions |
 | **ORCID** | JS SPA | `pub.orcid.org/v3.0/{orcid-id}` | JSON API with publications, employment, keywords |
@@ -696,6 +795,7 @@ Many platforms block AI tool fetches (403 errors, JavaScript-only rendering, too
 | Find LinkedIn | `"First Last" site:linkedin.com [job title]` | Most reliable starting point |
 | Find GitHub | `"First Last" site:github.com` or search GitHub directly | Check contributions, not just repos |
 | Find Reddit activity | `[project name] site:reddit.com` (NO quotes on project name) | Plain keywords work better than exact match |
+| Reddit via archive API | `arctic-shift.photon-reddit.com/api/posts/search?author=[username]&limit=100` | Bypasses Reddit bot blocking; also search comments and keywords. Use for EVERY known handle. |
 | Find Stack Overflow | `[username] site:stackoverflow.com` AND `[project-name] site:stackoverflow.com` | Search BOTH by name and by project |
 | Find Terraform artifacts | `[username] site:registry.terraform.io` AND search GitHub for `terraform-provider-*` repos | Strong Go + IaC signal |
 | Find Docker images | `[username] site:hub.docker.com` | Check image descriptions for links |
