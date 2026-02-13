@@ -821,22 +821,27 @@ curl -s -L \
 | **Terraform Registry** | JS wall | `registry.terraform.io/v1/providers/{namespace}/{name}` | JSON API with download counts, versions |
 | **ORCID** | JS SPA | `pub.orcid.org/v3.0/{orcid-id}` | JSON API with publications, employment, keywords |
 | **FINRA BrokerCheck** | JS SPA | `api.brokercheck.finra.org/search/individual?query={name}&nrows=10` | JSON API with CRD numbers, firm affiliations |
-| **Google Scholar** | JS SPA | `api.semanticscholar.org/graph/v1/author/search?query={name}` | Rate-limited; add `&fields=name,hIndex,citationCount,paperCount` for metrics |
-| **IMDb** | Processing failure | `dbpedia.org/data/{Person_Name}.json` | Structured data. Also try `themoviedb.org/person/{id}-{name}` or `rottentomatoes.com/celebrity/{slug}` |
+| **Google Scholar** | JS SPA | **curl with browser headers** on `scholar.google.com/citations?user={id}` | Returns full HTML: citation count, h-index, i10-index, research areas, paper list. Also: Semantic Scholar API `api.semanticscholar.org/graph/v1/author/search?query={name}&fields=name,hIndex,citationCount,paperCount` |
+| **IMDb** | JS SPA | **curl with browser headers** on `imdb.com/name/{id}/` | Returns full JSON-LD Person schema (name, jobTitle, birthDate, bio) + og:description with filmography. Also: `dbpedia.org/data/{Person_Name}.json` or `themoviedb.org` |
+| **Kaggle** | JS SPA | **curl with browser headers** on `kaggle.com/{username}` | Returns og:title + og:description with name, bio, titles, affiliations. |
+| **SEC EDGAR** | 403 on sec.gov | **curl with browser headers** on `efts.sec.gov/LATEST/search-index?q={query}&forms={form_type}` | Returns JSON with filing data: company names, CIK, dates, filing types. Works for proxy statements (DEF 14A), 10-K, etc. |
+| **Google Patents** | WebFetch fails | **curl with browser headers** on `patents.google.com/patent/{patent_id}` | Returns full patent HTML with title, abstract, claims. |
+| **NPI Registry** | — | `npiregistry.cms.hhs.gov/api/?number={npi}&version=2.1` | JSON API for healthcare provider lookup. Works with both WebFetch and curl. |
+| **Discogs** | 403 on website | `api.discogs.com/artists/{id}` or `/database/search?q={query}&type=artist` | JSON API with artist profiles, discography, band members. |
 
 #### Platforms with No Direct Access (Web Search Only)
 
 | Platform | Block Type | Recommended Fallback |
 |----------|-----------|---------------------|
-| **Medium** | 403 | WebSearch; check author's personal blog for cross-posts |
-| **Glassdoor** | 403 | WebSearch `"company" reviews site:glassdoor.com` |
-| **Crunchbase** | 403 + API auth required | WebSearch for funding data; Wikipedia company pages |
-| **SEC EDGAR** | 403 (requires custom User-Agent) | WebSearch `site:sec.gov "company" 10-K` |
-| **Product Hunt** | 403 | WebSearch `site:producthunt.com "product name"` |
-| **Wellfound/AngelList** | 403 | WebSearch `site:wellfound.com "company"` |
-| **Kaggle** | JS SPA + API auth | WebSearch `site:kaggle.com "username"` |
-| **Behance** | JS SPA | WebSearch `site:behance.net "username"`; try Dribbble or ArtStation instead |
-| **USPTO TSDR** | 403 | Use Google Patents (works!) as full alternative |
+| **Medium** | 403 (even curl) | WebSearch; check author's personal blog for cross-posts |
+| **Glassdoor** | 403 (even curl) | WebSearch `"company" reviews site:glassdoor.com` |
+| **Crunchbase** | 403 (even curl) | WebSearch for funding data; Wikipedia company pages |
+| **Product Hunt** | 403 (even curl) | WebSearch `site:producthunt.com "product name"` |
+| **Wellfound/AngelList** | 403 (even curl) | WebSearch `site:wellfound.com "company"` |
+| **ResearchGate** | 403 (even curl) | Use Google Scholar (curl works!) or Semantic Scholar API instead |
+| **Muck Rack** | 403 (even curl) | WebSearch `"First Last" site:muckrack.com`; try Google News byline search instead |
+| **Behance** | 404 (even curl) | WebSearch `site:behance.net "username"`; try Dribbble or ArtStation instead |
+| **USPTO TSDR** | 403 | Use Google Patents with curl (works!) as full alternative |
 
 ### Effective Search Patterns
 
@@ -919,10 +924,17 @@ curl -s -L \
 - Published modules indicate IaC maturity.
 
 **Academic/Research Platforms** (Google Scholar, ResearchGate, ORCID, Semantic Scholar):
+- **Google Scholar works with curl** — `curl -s -L -H 'User-Agent: Mozilla/5.0 ...' 'https://scholar.google.com/citations?user={id}'` returns full HTML with citation count, h-index, i10-index, research areas, and paper list. ResearchGate is fully blocked (403 even with curl) — use Google Scholar or Semantic Scholar API instead.
 - Check citation counts and h-index for research impact.
 - Look for co-authors — reveals collaboration networks.
 - Check if papers are in high-impact venues (top-tier conferences, high-IF journals).
 - Pre-prints on arXiv/bioRxiv signal active research engagement.
+
+**IMDb** (film/TV/media candidates):
+- **Works with curl** — `curl -s -L -H 'User-Agent: Mozilla/5.0 ...' 'https://www.imdb.com/name/{id}/'` returns JSON-LD Person schema with name, jobTitle, birthDate, and full bio + filmography in og:description.
+
+**SEC EDGAR** (executive/finance/board member candidates):
+- The main sec.gov site blocks all automated access (403), but the **full-text search API works with curl**: `curl -s -L -H 'User-Agent: Mozilla/5.0 ...' 'https://efts.sec.gov/LATEST/search-index?q=%22person+name%22&forms=DEF+14A'` returns JSON with filing data. Use `forms=DEF+14A` for proxy statements (board members, executive compensation), `forms=10-K` for annual reports.
 
 **Twitter/X**:
 - **Completely walled off as of 2025.** All twitter.com/x.com pages require JS. The syndication endpoint (`syndication.twitter.com`) now returns empty data. All Nitter instances (xcancel.com, nitter.tiekoetter.com) and Nitter proxies (twiiit.com) are dead or 403.
@@ -940,10 +952,10 @@ curl -s -L \
 - For Glassdoor: WebSearch `"company" reviews site:glassdoor.com` — Google snippets often include rating and review counts.
 
 **SEC EDGAR**:
-- All sec.gov endpoints return 403 (they require a custom User-Agent header that tools cannot set). Use WebSearch `site:sec.gov "company" 10-K` for indexed filings. Google typically indexes the most recent filings.
+- The main sec.gov site returns 403, but the **full-text search API works with curl**: `efts.sec.gov/LATEST/search-index?q=%22person+name%22&forms=DEF+14A` returns JSON. Also WebSearch `site:sec.gov "company" 10-K` for Google-indexed filings.
 
 **IMDb**:
-- Direct fetch fails (processing error). For film/TV credit verification, use:
+- **Works with curl** — returns JSON-LD Person schema + full bio. Also try as fallbacks:
   - `dbpedia.org/data/{Person_Name}.json` — structured data from Wikipedia/DBpedia
   - `themoviedb.org/person/{id}-{name}` — full credits and bio (web-accessible)
   - `rottentomatoes.com/celebrity/{slug}` — filmography with audience/critic scores
