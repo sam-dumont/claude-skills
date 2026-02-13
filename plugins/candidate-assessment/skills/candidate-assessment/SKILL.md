@@ -123,7 +123,8 @@ Build an initial profile using web research:
 
 Search strategy for Name-Only:
 - `"First Last" site:getprog.ai` — for tech candidates, getprog.ai mirrors full LinkedIn profiles (experience, education, skills, about). WebFetch the result URL for complete data.
-- `"First Last" site:linkedin.com [job title]` — Google/Bing snippets show headline, role, location even without LinkedIn access
+- `"First Last" site:linkedin.com [job title OR institution OR location]` — Google/Bing snippets show headline, role, location even without LinkedIn access. **When multiple results appear, evaluate ALL of them** — the correct profile may not be the first result. Cross-reference each result's headline, location, and institution against known data before dismissing any.
+- `"First Last" site:linktr.ee OR site:beacons.ai OR site:about.me` — link aggregator profiles often link to the correct LinkedIn profile and other platforms
 - `"First Last" site:github.com`
 - `"First Last" [company name]`
 - `"First Last" [specialization] [location]`
@@ -227,7 +228,20 @@ Produce a structured summary of ALL your findings. This digest must be self-cont
 - Every evidence rating (Strong/Moderate/Weak/None) with justification
 - Every concern, gap, or notable observation
 - Specific quotes or data points that matter (don't just say "active GitHub" — say "mass contributions in 2023, mass Go code, mass Terraform providers, 2.1k stars on project X")
-- Target length: 1500-3000 words. Err on the side of MORE detail, not less. The synthesis agent cannot go back and read your full output — if it's not in the digest, it's lost.
+- Target length: 2500-4000 words. If your findings fill 5000 words, include all 5000. Err on the side of MORE detail, not less. The synthesis agent cannot go back and read your full output — if it's not in the digest, it's lost.
+
+**Mandatory Inclusion Checklist** — If you discovered ANY of the following, they MUST appear in your digest with full detail. Omitting these is the #1 cause of thin reports:
+
+1. **Every website/domain** (URL + full analysis of content, purpose, tech stack, design — not just "site exists")
+2. **Every Reddit post/comment pattern** (subreddits active in, topics discussed, upvote patterns, personality signals revealed — not just "Reddit account found")
+3. **Company financial data** (revenue, profit, equity, source registry — not just "company exists")
+4. **GitHub stars and follows analysis** (notable repos starred, notable people followed, what interest patterns emerge — not just star count)
+5. **Conference talk titles IN FULL** (creative or unusual titles are personality signals — never summarize as "gave 7 talks")
+6. **Personal interests and hobbies from any source** (Reddit, Strava, forum posts, social media — these are character signals)
+7. **Career timeline with dates and sources** (every role, every transition, with the source for each data point)
+8. **Business entity details** (registration date, address, legal form, financials, registered activities — for every entity discovered)
+9. **Third-party mentions** (blog posts, case studies, manager attributions, customer stories that mention the candidate by name)
+10. **Platform-specific profile details** (even minor platforms — Last.fm, Steam, Garmin Connect, niche forums — if found, describe what they reveal)
 
 **Section 3 — Deferred Handles** (Self-Assessment Enhanced mode only — omit in other modes):
 
@@ -281,12 +295,50 @@ Research the candidate's public digital presence using the seed list from Phase 
 - LinkedIn: recommendations, endorsements, activity, post quality
 - Personal website/blog: content depth, writing quality, topics, update frequency
 
+#### Website Discovery & Analysis Protocol
+
+When a personal website, management company site, or side-project domain is discovered during research:
+
+1. **ALWAYS attempt to fetch it** (use the full fallback tier: WebFetch → curl with browser headers → WebSearch for cached versions). Do not skip a domain just because the first fetch method fails.
+2. **If the site is live**: Describe its content, purpose, design choices, tech stack signals (view-source for frameworks, analytics, meta tags), and any business entity connections. Note hidden details: custom 404 pages, robots.txt contents, Easter eggs, print CSS, source code comments, bot traps.
+3. **If the site is down**: Search archive.org (`web.archive.org/web/*/[domain]`) for cached versions. Describe what the site was, when it was last active, and what its existence reveals.
+4. **Search for ALL domains associated with discovered business entities**: If you find a management company (e.g., Pilcrow BV), search for every domain registered to that entity or associated with it.
+5. **Include FULL analysis in your digest** — do not compress domain findings to "site exists" or "operates a website." The synthesis agent cannot visit the site — your digest IS the site analysis.
+
+A personal domain someone registered, designed, and maintains is one of the richest personality signals available. Treat it accordingly.
+
 **Community Presence**:
 - Conference talks, meetup presentations (search YouTube, SlideShare, Speaker Deck)
 - Podcast appearances
 - Published articles or papers
 - Forum participation (Hacker News, relevant subreddits, Discord servers)
 - Mailing list archives (for open-source contributors)
+
+#### Link Aggregator Discovery Protocol
+
+Many professionals — especially creators, freelancers, early-career researchers, and anyone managing a multi-platform presence — use link aggregator services as their primary professional hub. These aggregate portfolio items, publications, social links, and project pages in a single, publicly accessible page — often richer than any individual platform profile.
+
+**Search for link aggregators EARLY in the research process** — a single Linktree or equivalent can reveal profiles on 5+ platforms that would otherwise require separate searches:
+
+1. **Search by name**: `"First Last" site:linktr.ee OR site:beacons.ai OR site:carrd.co OR site:about.me OR site:bio.link`
+2. **Search by username variants**: Try `linktr.ee/[firstlast]`, `linktr.ee/[first.last]`, `linktr.ee/[first_last]` directly via curl
+3. **Check LinkedIn bio/about sections**: LinkedIn profiles frequently link to Linktree in their contact info or about section
+4. **Check institutional profiles**: University directory pages and ResearchGate profiles sometimes link to aggregators
+
+**When you find a link aggregator**:
+- **Fetch via curl** — Linktree returns clean HTML with JSON-LD `ProfilePage` structured data, all link URLs, and profile metadata (name, status, institution, creation date, last modified date)
+- Extract ALL links — these are the candidate's self-curated professional presence and may include: publication PDFs, conference presentations, academic profiles, social accounts, institutional pages
+- Use discovered links as new seed identifiers for further research
+- Link aggregator profiles are **explicit links** (the candidate created them) — no verification gate needed
+
+**Accessibility notes**:
+| Platform | Curl Access | Data Quality |
+|----------|------------|-------------|
+| **Linktree** (`linktr.ee`) | Full access, clean HTML + JSON-LD | Rich: all links, titles, profile metadata, timestamps |
+| **Beacons** (`beacons.ai`) | Usually accessible | Moderate: links and profile info |
+| **Carrd** (`carrd.co`) | Usually accessible | Variable: depends on user's page design |
+| **About.me** | Usually accessible | Moderate: bio, links, photo |
+| **bio.link** | Usually accessible | Moderate: links and profile info |
 
 #### Project-by-Project Cross-Platform Sweep
 
@@ -573,6 +625,25 @@ Understand the context around each employer:
 
 This context matters because "Senior Engineer at [company]" means very different things depending on whether the company had 5 or 5000 engineers.
 
+#### Side Business & Management Company Deep Dive Protocol
+
+When management companies, freelance entities, or side businesses are discovered (common in Belgium/Netherlands: BV/BVBA structures; in other countries: LLC, Ltd, sole proprietorships):
+
+1. **Search the national company registry**:
+   - Belgium: KBO/BCE (Kruispuntbank van Ondernemingen) — search via `kbopub.economie.fgov.be`
+   - Netherlands: KvK (Kamer van Koophandel) — search via `kvk.nl`
+   - UK: Companies House — search via `find-and-update.company-information.service.gov.uk`
+   - US: State Secretary of State databases
+   - Other countries: search for "[country] company registry" + company name
+
+2. **Pull financial data**: Revenue, profit/loss, equity, total assets, employee count. For Belgian companies, annual accounts are public via the National Bank (NBB). For UK companies, filings are on Companies House. Include the source.
+
+3. **Identify ALL registered business activities**: Company registries list NACE codes or SIC codes describing business activities. A tech consultant with "pig farming" as a registered activity is a critical personality signal.
+
+4. **Search for other domains, trademarks, or subsidiaries** associated with the entity.
+
+5. **Analyze what the side business reveals**: Farms, creative ventures, non-tech businesses — these are NOT footnotes. They reveal values, interests, risk tolerance, entrepreneurial tendencies, and life priorities. A data engineer who runs a pig farm through the same BV as their consulting work is telling you something about who they are. Include this analysis in your digest.
+
 ### Agent D: Reference & Reputation Signals
 
 Look for indirect reputation signals:
@@ -649,6 +720,20 @@ In Self-Assessment Enhanced mode, the MAIN agent must handle identity verificati
 
 2. **Instructions for the synthesis agent**: The synthesis agent must perform Phase 2.75 (Cross-Platform Correlation) AND Phase 3 (Final Report) as described below. Its output IS the final report shown to the user.
 
+3. **Report length requirements**: The final report MUST be at least 5000 words for candidates with moderate-to-rich data. If the combined agent digests exceed 8000 words, the report should be at least 6000 words. A 2000-word report from 10000 words of research means 80% of the findings were dropped — that is unacceptable.
+
+4. **"No Data Left Behind" completeness check**: Before finalizing the report, the synthesis agent must re-read each agent digest and verify that every factual finding appears somewhere in the report. The following data types are the most commonly dropped — check these specifically:
+   - Websites/domains mentioned but not analyzed (e.g., "akkervarken.be was found" without describing what the site is, what it contains, what it reveals)
+   - Reddit activity noted but personality signals omitted (e.g., "Reddit activity found" without listing subreddits, topics, and what the posting patterns reveal about the person)
+   - Business financials listed in one table cell without discussing implications (e.g., revenue and profit figures that are never interpreted)
+   - Conference talks summarized as a count without listing creative titles (e.g., "7 conference talks" without noting that "The Data Engineering Shepherd" connects farming and engineering)
+   - GitHub stars noted without analyzing interest patterns (e.g., "follows 40 people" without noting which tools/communities they follow)
+   - Hobbies and personal interests discovered but treated as footnotes instead of personality signals
+
+5. **Website analysis mandate**: The synthesis agent MUST produce a dedicated analysis paragraph for every domain discovered by any research agent. "akkervarken.be was found" is not analysis. "akkervarken.be is a regenerative pig farm operated by Pilcrow BV, the same entity that houses his tech consulting work — connecting his agricultural roots to his professional identity through a single legal structure" IS analysis. If an agent's digest mentions a domain, it gets a paragraph in Section 3.1.5.
+
+6. **Inline source citation mandate**: Every factual claim in every section of the report must include its source inline as `(source: [URL or description])`. This applies to all sections — executive summary, website analysis, skills assessment, mentality profile, reading between the lines, strengths, concerns, solo/team, churn risk, and signal gaps. The verification table (3.2.5) already has per-row sources; all other sections must match this standard.
+
 **CRITICAL — NO INTERMEDIATE OUTPUT, NO POST-REPORT OUTPUT**: The main agent must NOT produce any text before or after the synthesis agent's report, except:
 - Identity verification questions (Phase 2.5, if applicable)
 - A brief "Starting assessment..." message at the very beginning
@@ -708,6 +793,27 @@ The synthesis agent runs a FINAL correlation pass using the Discovered Identifie
 
 The synthesis agent compiles all research into one single, definitive, comprehensive assessment. This is the ONLY output the user receives — there are no drafts, previews, partial reports, or addendums.
 
+**Source Citation Rule**: Every factual claim in the report must include an inline source citation in parentheses. This is not optional. A report without sources is not a report — it's an opinion. Format: `(source: [URL or description])`. Apply this to ALL sections, not just the verification table. Example: "He evaluated eight different catalogs (source: https://datahub.com/customer-stories/dpg-media/)." Not just "VERIFIED" — the actual source.
+
+**Writing Style Directive**: Default to free-flowing narrative paragraphs. Use tables ONLY for structured reference data that benefits from scannable columns (verification status, skills evidence matrix). For everything else — personality insights, strengths, concerns, churn analysis, website analysis, team assessment — write in prose paragraphs.
+
+Tables are for DATA. Paragraphs are for INSIGHT.
+
+Specifically:
+- Section 3.1 Executive Summary: paragraphs (already is)
+- Section 3.1.5 Website Analysis: paragraphs — describe each site as a narrative, not bullet points
+- Section 3.2 Professional Depth: TABLE is appropriate here (structured skills data)
+- Section 3.2.5 Verification Table: TABLE is appropriate (structured verification data)
+- Section 3.3 Mentality Profile: TABLE for the 8-dimension overview, then PARAGRAPHS for elaboration
+- Section 3.3.5 Reading Between the Lines: PARAGRAPHS — numbered narrative insights
+- Section 3.4 Strengths & Concerns: PARAGRAPHS — each strength/concern is a full paragraph with evidence, not a bullet point
+- Section 3.4.5 Solo vs Team: PARAGRAPHS with embedded ratings
+- Section 3.5 Churn Risk: TABLE for the matrix overview, then PARAGRAPHS for "What Would Make Them Leave/Stay"
+- Section 3.6 Signal Gaps: PARAGRAPHS per gap, not a table
+- Section 3.7.5 Hidden Detail: PARAGRAPH — a boxed narrative insight
+- Section 3.8 Final Verdict: PARAGRAPHS
+- Section 3.9 Interview Questions: structured format (Question/Why/Good/Red flag) is fine
+
 ### 3.1 Executive Summary
 
 2-3 paragraphs covering:
@@ -715,6 +821,24 @@ The synthesis agent compiles all research into one single, definitive, comprehen
 - What's the career narrative? (trajectory, not just timeline)
 - What's the overall signal quality? (strong evidence, moderate, or mostly self-reported?)
 - Initial hiring thesis: what role would this person excel in? What role would be a poor fit?
+
+### 3.1.5 Website & Portfolio Analysis
+
+Produce a dedicated analysis paragraph for EVERY domain discovered during research — personal sites, management company sites, side-project domains, portfolio sites. This section is mandatory if any domains were found.
+
+For each domain:
+- **What it is**: The site's purpose, who it serves, what it contains
+- **Tech stack signals**: Frameworks, hosting, CMS, analytics tools, meta tags — what do the technology choices reveal about the person?
+- **Design language**: Visual style, quality, attention to detail, accessibility, mobile responsiveness
+- **Business entity connections**: Is the domain registered to a company? Which one? What does the ownership structure reveal?
+- **Hidden details**: Easter eggs, bot traps, custom 404 pages, print CSS, robots.txt contents, interesting meta tags, source code comments — anything that reveals intentionality or personality
+- **What it tells you about the person**: Synthesize the above into a personality/professional insight
+
+If a site was down at time of research: note the URL, describe what was found via archive.org or search engine cached snippets, and what the site's existence (even if defunct) tells you.
+
+If NO domains were discovered, explicitly state: "No personal websites or portfolio domains were found during research."
+
+**Write this as narrative prose** — one or more paragraphs per domain. Do NOT compress domain analysis to a single bullet point like "operates a farm website." A domain someone registered, built, and maintains is a window into their priorities.
 
 ### 3.2 Professional Depth Assessment
 
@@ -744,6 +868,27 @@ For each claimed area of expertise, provide a comprehensive evidence map:
 - **Community**: Conference talks, forum posts, recommendations, endorsements
 - **Recognition**: Awards, rankings, citations, grants
 
+### 3.2.5 Claim Verification Summary
+
+Present a verification table covering every significant factual claim from the candidate's CV, LinkedIn, or discovered profiles. Every row must cite the specific source used for verification — not just "VERIFIED" but the actual URL, registry name, or database.
+
+| Claim | Verification Status | Evidence Source |
+|-------|-------------------|----------------|
+| [Specific claim from CV/profile] | VERIFIED | [Exact source: URL, registry name, article title] |
+| [Another claim] | PARTIALLY VERIFIED | [What was confirmed + what wasn't + source] |
+| [Another claim] | NOT CONFIRMED | [What was searched, why it couldn't be confirmed] |
+| [Another claim] | UNVERIFIABLE | [Why: proprietary work, NDA, too old, no public records] |
+| [Another claim] | CONTRADICTED | [What the evidence actually shows + source] |
+
+**Verification statuses**:
+- **VERIFIED**: Confirmed by at least one independent source with direct evidence
+- **PARTIALLY VERIFIED**: Some aspects confirmed, others not (explain which parts)
+- **NOT CONFIRMED**: Searched but found no corroborating evidence (not the same as contradicted)
+- **UNVERIFIABLE**: Cannot be checked via OSINT (proprietary projects, NDA-covered work, verbal agreements)
+- **CONTRADICTED**: Evidence suggests the claim is inaccurate or misleading (explain the discrepancy)
+
+Include at minimum: job titles, employment dates, education claims, specific achievement claims, technology expertise claims, and any quantitative metrics cited on the CV. Aim for 15+ rows for candidates with detailed CVs.
+
 ### 3.3 Mentality Profile
 
 Assess across 8 dimensions based on all available evidence. Use a spectrum, not a binary.
@@ -761,19 +906,53 @@ Assess across 8 dimensions based on all available evidence. Use a spectrum, not 
 
 **Important**: These are descriptive, not prescriptive. "Builder" is not better than "Maintainer" — it depends on what the role needs. Frame each dimension as fit-for-role, not good/bad.
 
+### 3.3.5 Reading Between the Lines
+
+This is the narrative layer that transforms data into character insight. Produce 6-10 numbered personality insights derived from the FULL body of evidence — hobbies, side projects, Reddit activity, talk titles, tool choices, career transitions, financial structure, writing style, community involvement.
+
+Each insight follows this structure:
+1. **[Observation Label]**: [Interpretation] — [Specific evidence]
+
+Examples of the depth expected:
+- "**Builder, not a talker**: He ships tools for personal use and publishes them without marketing. The GitHub activity shows mass creation with minimal self-promotion — no blog posts announcing releases, no Twitter threads. The work speaks; he doesn't." (source: GitHub profile)
+- "**Autonomy-driven**: Every career move goes toward more independence — from employee to freelancer to management company owner. The side businesses aren't hobbies; they're escape valves from corporate structure." (source: career timeline + KBO registry)
+- "**Endurance-sports identity as character signal**: Marathon running, cycling, long-distance events — these aren't casual hobbies. They select for delayed gratification, pain tolerance, and structured training. The Garmin data obsession signals a metrics-driven personality." (source: Strava/Garmin profile + Reddit posts)
+
+Draw from ALL evidence sources: Reddit post history reveals interests and communication style. Conference talk titles reveal creativity and how they frame ideas. Tool choices (suckless, Arch Linux, vim) reveal philosophy. Side businesses reveal values. Financial structures reveal planning orientation. Hobbies reveal character.
+
+**Write as flowing paragraphs**, not bullet points. Each insight should be a mini-narrative that connects evidence to character.
+
 ### 3.4 Strengths & Concerns
 
-**Strengths** (with evidence):
-- [Strength 1]: [Evidence supporting this]
-- [Strength 2]: [Evidence supporting this]
-- [Strength 3]: [Evidence supporting this]
+**Minimum targets**: Identify at least 8 strengths and at least 6 concerns. A report with 3 strengths and 2 concerns is a sketch, not an assessment. Dig deeper — every career has more texture than that.
 
-**Concerns** (with evidence and severity):
-- [Concern 1]: [Evidence] — Severity: [Low/Medium/High] — [Can be verified in interview? Y/N]
-- [Concern 2]: [Evidence] — Severity: [Low/Medium/High] — [Can be verified in interview? Y/N]
+**Strengths** (minimum 8, with evidence — write each as a full paragraph, not a single sentence):
+
+Each strength should be a dedicated paragraph that includes: what the strength is, specific evidence from research (with source citations), and why it matters for a hiring decision. Don't just list "good communicator" — explain HOW you know, WHAT the communication looks like, and WHY it's relevant.
+
+**Concerns** (minimum 6, with evidence and severity — write each as a full paragraph):
+
+Each concern should include: what the concern is, specific evidence, severity rating (Low/Medium/High), whether it can be verified in an interview (Y/N), and if Y — what the interviewer should specifically look for or ask. A concern is not an accusation; it's a data point that warrants further investigation.
 
 **Yellow Flags** (things that aren't concerns but warrant attention):
-- [Flag 1]: [Why it caught attention]
+
+Yellow flags are patterns or signals that aren't negative on their own but could become relevant depending on role fit, team dynamics, or company culture. Write each as a short paragraph explaining what caught your attention and why.
+
+### 3.4.5 Solo vs. Team Player Assessment
+
+Rate both dimensions independently with evidence:
+
+**Solo Effectiveness: [X/10]**
+
+Write 1-2 paragraphs on how this person operates independently. Evidence to consider: solo side projects, solo business ventures, self-directed learning patterns, ability to ship without a team, self-managed freelance work, independent open-source maintenance.
+
+**Team Effectiveness: [X/10]**
+
+Write 1-2 paragraphs on how this person operates in collaborative settings. Evidence to consider: open-source collaboration (PR reviews, issue discussions, co-authored commits), team sports or group hobbies, conference co-presentations, multi-author publications, management experience, mentoring signals.
+
+**Best-Fit Team Structure**: Describe the ideal team setup for this person — team size, reporting structure, level of autonomy, collaboration frequency.
+
+**Communication & Soft Skills**: Assess written communication (blog posts, documentation, PR descriptions, forum posts), verbal communication (conference talks, podcast appearances), client/stakeholder management signals, and interpersonal style (tone in online interactions, conflict resolution patterns).
 
 ### 3.5 Churn Risk Matrix
 
@@ -786,13 +965,25 @@ Assess across 8 dimensions based on all available evidence. Use a spectrum, not 
 | **Seniority fit** | [Overqualified? Underqualified? Right level?] | [Role history vs. target role] |
 | **Location/remote** | [Any signals about work arrangement preferences] | [Profile, company history] |
 
+**What Would Make Them Leave** (write as narrative paragraphs, not just a table):
+
+For each identified churn trigger, write a paragraph covering: what the trigger is, how likely it is to occur (High/Medium/Low probability), what evidence supports this assessment, and what a company could do to mitigate it. Consider: boredom from unchallenging work, lack of autonomy, bureaucratic friction, insufficient compensation growth, better offers in their niche, entrepreneurial pull from side projects, geographic preferences, technology stack misalignment.
+
+**What Would Make Them Stay** (write as narrative paragraphs):
+
+For each retention lever, write a paragraph covering: what the lever is, what evidence suggests it works for this person, and how a company could actively deploy it. Consider: technical challenge and learning opportunities, ownership and autonomy, team quality, flexible work arrangements, equity/upside participation, conference speaking support, open-source contribution time, side project tolerance.
+
 ### 3.6 Signal Gaps & Open Questions
 
-What couldn't you find? What remains unverified?
+What couldn't you find? What remains unverified? Write each gap as a dedicated paragraph, not a single bullet point.
 
-- [Gap 1]: Could not verify [claim]. Recommend asking in interview.
-- [Gap 2]: No public evidence of [skill]. May be valid but unverifiable from OSINT.
-- [Gap 3]: Timeline gap between [date] and [date]. Could be sabbatical, personal reasons, or unlisted role.
+For each gap, include:
+- **What the gap is**: Describe what couldn't be found or verified
+- **What was searched**: List the specific platforms, registries, and queries attempted. "No evidence found" is useless without "searched X, Y, and Z."
+- **What the absence might mean**: Interpret charitably — proprietary work, NDA, private person, platform not relevant to their domain. Absence of signal is NOT negative signal.
+- **Which interview question addresses it**: Cross-reference to a specific question in Section 3.9 that would help close this gap
+
+Example gaps to consider: unverifiable role claims, timeline gaps, skills with no public artifacts, missing online presence on expected platforms, uncorroborated achievement metrics, education details that can't be confirmed, unexplained career transitions.
 
 **Important**: Frame gaps neutrally. A gap is not evidence of a problem — it's absence of information.
 
@@ -807,7 +998,39 @@ Constructive feedback on CV/profile presentation:
 - What structural changes would make the CV clearer?
 - What sections are well done and should be kept as-is?
 
-### 3.8 Targeted Interview Questions
+### 3.7.5 The Hidden Detail That Tells You Everything
+
+Identify the single most revealing data point about this candidate — the one finding that, by itself, tells you more about who they are than any resume line item could.
+
+Present it as a boxed insight:
+
+> **The Detail**: [What was discovered — be specific]
+>
+> **Why It Matters**: [What this reveals about their character, values, or working style]
+>
+> **What It Predicts**: [How this insight translates to workplace behavior — what you can expect from this person]
+
+This should be a genuinely surprising or non-obvious finding. Not "they have 10 years of experience" — that's a resume fact. More like: "their personal farm website is registered under the same business entity as their tech consulting company" or "they built an AI bot trap into their personal site's robots.txt" or "their conference talk titles all follow a pattern of combining farming metaphors with data engineering concepts." The hidden detail is where the detective work pays off.
+
+### 3.8 Final Verdict
+
+Clear, actionable hiring recommendation. No hedging behind "it depends" — commit to a position.
+
+**Recommendation**: [Hire / Conditional Hire / Pass]
+
+If Conditional Hire, state the specific conditions that must be met (e.g., "Hire if the role offers X" or "Hire contingent on verifying Y in interview").
+
+**Best-Fit Roles** (2-3 specific roles with justification):
+- [Role 1]: [Why they'd excel — specific evidence]
+- [Role 2]: [Why they'd excel — specific evidence]
+
+**Roles to Avoid** (2-3 with justification):
+- [Role 1]: [Why it would be a poor fit — specific evidence]
+- [Role 2]: [Why it would be a poor fit — specific evidence]
+
+**Bottom Line**: One paragraph that captures the essence of this candidate. What is the core question a hiring manager should ask themselves? Not "are they qualified?" — that's what the rest of the report covers. The bottom line should be the strategic question: "The question isn't whether they're good enough — it's whether your environment is [X] enough to [Y]."
+
+### 3.9 Targeted Interview Questions
 
 Generate 10-15 interview questions specifically tailored to THIS candidate. Not generic questions — questions that probe the gaps, verify the claims, and test the concerns identified above.
 
@@ -901,6 +1124,8 @@ curl -s -L \
 - Returns 406KB+ of data including: JSON-LD Person schema (name, jobTitle, worksFor with dates, alumniOf, location, follower count), og:description (headline + about + experience + education summary), recent LinkedIn posts with content and like counts, full HTML experience/education sections
 - Profile must be publicly visible (some profiles with strict privacy settings return 404)
 - Use the LinkedIn vanity URL: `linkedin.com/in/{slug}`
+- **Disambiguation when multiple profiles share the same name**: When WebSearch returns multiple LinkedIn results for a common name, do NOT assume the first result is the right one. Curl EACH candidate profile and check `worksFor`, `alumniOf`, `jobTitle`, and location in the JSON-LD schema against known data. Non-vanity URL slugs (e.g., `jane-doe-9a7bbb270`) are common for less-active profiles — do not skip them.
+- **Check LinkedIn bio for link aggregators**: LinkedIn profiles frequently contain Linktree or similar links in the about section or contact info. These are goldmines — a single Linktree can reveal portfolio items, project pages, and profiles on 5+ platforms.
 
 **Reddit-specific curl notes**:
 - Use `old.reddit.com/user/{username}` — old Reddit serves full server-rendered HTML
@@ -931,6 +1156,7 @@ curl -s -L \
 | **Google Patents** | WebFetch fails | **curl with browser headers** on `patents.google.com/patent/{patent_id}` | Returns full patent HTML with title, abstract, claims. |
 | **NPI Registry** | — | `npiregistry.cms.hhs.gov/api/?number={npi}&version=2.1` | JSON API for healthcare provider lookup. Works with both WebFetch and curl. |
 | **Discogs** | 403 on website | `api.discogs.com/artists/{id}` or `/database/search?q={query}&type=artist` | JSON API with artist profiles, discography, band members. |
+| **Linktree** | No blocking | **curl with browser headers** on `linktr.ee/{username}` | Returns clean HTML + JSON-LD ProfilePage with all link URLs, titles, profile metadata (name, status, timestamps). Also works with WebFetch. Best single source for candidates who aggregate their professional presence in one place. |
 
 #### Platforms with No Direct Access (Web Search Only)
 
@@ -941,7 +1167,7 @@ curl -s -L \
 | **Crunchbase** | 403 (even curl) | WebSearch for funding data; Wikipedia company pages |
 | **Product Hunt** | 403 (even curl) | WebSearch `site:producthunt.com "product name"` |
 | **Wellfound/AngelList** | 403 (even curl) | WebSearch `site:wellfound.com "company"` |
-| **ResearchGate** | 403 (even curl) | Use Google Scholar (curl works!) or Semantic Scholar API instead |
+| **ResearchGate** | 403 (even curl) | WebSearch `"First Last" site:researchgate.net` — Google snippets return profile metadata (title, institution, department, publications). Also try: `"First Last" ResearchGate [specialty]`. Profile URLs follow pattern `/profile/First_Last` or `/profile/First_Last2` (numbered suffix for common names). Use Google Scholar or Semantic Scholar API for deeper publication data. |
 | **Muck Rack** | 403 (even curl) | WebSearch `"First Last" site:muckrack.com`; try Google News byline search instead |
 | **Behance** | 404 (even curl) | WebSearch `site:behance.net "username"`; try Dribbble or ArtStation instead |
 | **USPTO TSDR** | 403 | Use Google Patents with curl (works!) as full alternative |
@@ -963,6 +1189,9 @@ curl -s -L \
 | Cross-platform username | `"[username]" -site:[known-platform]` | Exclude known platforms to find new ones |
 | Find talks/presentations | `"First Last" [topic] site:youtube.com OR site:slideshare.net` | Also check conference websites directly |
 | Find publications | `"First Last" site:scholar.google.com` or `"First Last" arxiv` | For research-oriented candidates |
+| Find Google Scholar profile | WebSearch `"First Last" site:scholar.google.com/citations` then curl the profile URL | Discovers author profile with citation metrics; also try `scholar.google.com/citations?view_op=search_authors&mauthors=First+Last` |
+| Find ResearchGate profile | WebSearch `"First Last" site:researchgate.net [institution]` | Returns profile metadata in Google snippets even though direct access is blocked |
+| Find link aggregator | `"First Last" site:linktr.ee OR site:beacons.ai OR site:about.me` | Especially useful for creators, freelancers, and early-career professionals; aggregates all other profile links |
 | Find academic profile | `"First Last" site:researchgate.net OR site:orcid.org` | Check citation counts, h-index |
 | Find packages | Search npm/PyPI/crates.io directly for username | Often matches GitHub handle |
 | Find patent filings | `"First Last" site:patents.google.com` | For senior/inventive roles |
@@ -987,7 +1216,9 @@ curl -s -L \
 - Company "About" or "Team" pages often have richer bios than LinkedIn
 - Try at least 5 different query formulations per platform before concluding no presence exists
 - When one query finds a username, immediately pivot to searching that username across all other platforms
-- Search for project names WITH and WITHOUT hyphens/separators — `rkd-telemetry-extractor` vs `rkd telemetry extractor`
+- Search for project names WITH and WITHOUT hyphens/separators — `my-cool-project` vs `my cool project`
+- Check for link aggregator profiles (Linktree, Beacons, Carrd) EARLY — especially for creators, freelancers, and early-career professionals. A single aggregator page can reveal 5+ platform profiles and direct links to portfolio items, publications, or projects that individual platform searches would miss
+- When multiple people share a name on LinkedIn, do NOT default to the first result — curl each candidate profile and check the JSON-LD worksFor/alumniOf fields against known institutional affiliations
 
 ### Platform-Specific Notes
 
@@ -1027,7 +1258,8 @@ curl -s -L \
 - Published modules indicate IaC maturity.
 
 **Academic/Research Platforms** (Google Scholar, ResearchGate, ORCID, Semantic Scholar):
-- **Google Scholar works with curl** — `curl -s -L -H 'User-Agent: Mozilla/5.0 ...' 'https://scholar.google.com/citations?user={id}'` returns full HTML with citation count, h-index, i10-index, research areas, and paper list. ResearchGate is fully blocked (403 even with curl) — use Google Scholar or Semantic Scholar API instead.
+- **Google Scholar**: Two access patterns: (1) If you know the user ID: `curl ... 'scholar.google.com/citations?user={id}'` returns full HTML. (2) **To DISCOVER a profile**: WebSearch `"First Last" site:scholar.google.com/citations` to find the author profile URL, OR use `scholar.google.com/citations?view_op=search_authors&mauthors=First+Last` via curl (returns author search results in HTML). Also search for their publications directly: `"First Last" scholar.google.com` — Google indexes individual paper listings even when the author hasn't created a formal profile.
+- **ResearchGate is blocked** (403 even with curl), but **WebSearch works well**: `"First Last" site:researchgate.net` returns Google snippets with profile metadata including title, institution, department, and recent publications. Profile URLs use the pattern `/profile/First_Last` or `/profile/First_Last2` (numbered suffixes for common names). **Do NOT conclude "no ResearchGate profile" without trying this WebSearch pattern** — it frequently succeeds even when direct access fails.
 - Check citation counts and h-index for research impact.
 - Look for co-authors — reveals collaboration networks.
 - Check if papers are in high-impact venues (top-tier conferences, high-IF journals).
