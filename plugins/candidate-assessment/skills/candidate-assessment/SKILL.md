@@ -155,6 +155,8 @@ This seed list is the foundation for cross-platform research. Every identifier g
 
 Launch 4 research agents in parallel. Each has a specific focus area. Pass the full seed list from Phase 1.5 to every agent.
 
+**CRITICAL — NO INTERMEDIATE REPORTS**: Do NOT produce any assessment, summary, or partial report until ALL 4 agents have completed AND Phase 2.5 (Cross-Platform Correlation) is finished. Wait for every agent to return before writing anything. The user must receive ONE single, definitive report — never an initial report followed by addendums or updates. If some agents finish before others, wait silently for the remaining agents. Do not narrate agent completions to the user (e.g., "Agent A is done, here's what it found..."). The first output the user sees should be the complete Phase 3 synthesis.
+
 **Thoroughness calibration**: A thorough assessment should perform 40-60+ web searches per agent. If an agent completes with fewer than 20 searches, it likely didn't go deep enough. Each project, username, and company name should be searched across multiple platforms. Each claimed skill should be verified through at least 2-3 different search angles. Don't be satisfied with the first result — dig into second and third pages of results, try alternative query formulations, and follow every promising lead.
 
 **Critical instruction for ALL agents**: At the end of your research, output a **Discovered Identifiers** section listing:
@@ -463,6 +465,8 @@ Look for indirect reputation signals:
 
 ## Phase 2.5: Cross-Platform Correlation Pass
 
+**Prerequisite**: ALL 4 agents from Phase 2 must have returned their results before starting this phase. Do not begin correlation until every agent is done. Do not output anything to the user yet — this is still an internal research phase.
+
 After all 4 agents complete, compile their Discovered Identifiers sections and run a FINAL correlation pass:
 
 1. **Username propagation**: For every username found on any platform, search for that SAME username on all OTHER platforms:
@@ -490,6 +494,8 @@ After all 4 agents complete, compile their Discovered Identifiers sections and r
 ---
 
 ## Phase 3: Synthesis & Output
+
+**MANDATORY**: Only begin this phase after ALL 4 research agents AND Phase 2.5 have fully completed. This report is the ONLY output the user receives — there are no drafts, previews, partial reports, or addendums. Produce one single, definitive, comprehensive assessment. If you have already started writing and new information arrives, do NOT append an addendum — rewrite the relevant sections to incorporate the new information seamlessly.
 
 Compile all research into a structured assessment.
 
