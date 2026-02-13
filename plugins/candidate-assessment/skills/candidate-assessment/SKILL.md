@@ -770,7 +770,7 @@ Many platforms block AI tool fetches (403 errors, JavaScript-only rendering, too
 
 | Platform | Block Type | Working Alternative URL | Notes |
 |----------|-----------|------------------------|-------|
-| **Twitter/X** | JS wall | `syndication.twitter.com/srv/timeline-profile/screen-name/{username}` | Twitter's own SSR endpoint. Backup: `nitter.tiekoetter.com/{username}` or `twiiit.com/{username}` (auto-discovers working Nitter instances) |
+| **Twitter/X** | Full block (JS wall + Nitter dead + syndication empty) | No working direct access. | All Nitter instances (xcancel.com, nitter.tiekoetter.com) and Twitter's syndication endpoint are dead as of 2025. Use WebSearch only: `"username" site:twitter.com OR site:x.com`. Google still indexes tweets. Also try `"username" twitter` without site filter. |
 | **Stack Overflow** | Tool deny-list (all SO/SE domains) | WebSearch `"{name}" stackoverflow reputation answers` | Google snippets contain full metrics (rep, badges, tags). No direct access workaround exists. |
 | **npm** | 403 on website | `registry.npmjs.org/{package}` or `registry.npmjs.org/-/v1/search?text={query}&size=10` | JSON API returns full package metadata |
 | **Reddit** | Bot blocking (403/empty) | `arctic-shift.photon-reddit.com/api/posts/search?author={username}&limit=100` | Also: `/api/comments/search?author={username}&limit=100`, `/api/posts/search?q={keyword}&limit=100`. Fallback: `api.pullpush.io/reddit/search/submission/?author={username}&size=100` |
@@ -875,9 +875,10 @@ Many platforms block AI tool fetches (403 errors, JavaScript-only rendering, too
 - Pre-prints on arXiv/bioRxiv signal active research engagement.
 
 **Twitter/X**:
-- All twitter.com/x.com pages are JS-only and will fail to render. Use `syndication.twitter.com/srv/timeline-profile/screen-name/{username}` (Twitter's own widget endpoint) as primary fallback.
-- If the syndication endpoint fails, try `nitter.tiekoetter.com/{username}` (rate-limited) or `twiiit.com/{username}` (auto-discovers working Nitter instances).
-- For thread-heavy users, check `threadreaderapp.com/user/{username}` for unrolled threads.
+- **Completely walled off as of 2025.** All twitter.com/x.com pages require JS. The syndication endpoint (`syndication.twitter.com`) now returns empty data. All Nitter instances (xcancel.com, nitter.tiekoetter.com) and Nitter proxies (twiiit.com) are dead or 403.
+- **Only working approach**: WebSearch with `"username" site:twitter.com OR site:x.com`. Google still indexes tweets and profiles. Also try `"username" twitter` without site filter.
+- For thread-heavy users, try `threadreaderapp.com/user/{username}` for unrolled threads (may still work as it's a separate service).
+- Do NOT waste time retrying Nitter instances or syndication URLs — they are confirmed dead. If web search finds nothing, note it as a platform limitation and move on.
 
 **npm / Docker Hub**:
 - npm website returns 403. Use the JSON API: `registry.npmjs.org/{package}` for package details, `registry.npmjs.org/-/v1/search?text={query}&size=10` for searching by author/keyword.
