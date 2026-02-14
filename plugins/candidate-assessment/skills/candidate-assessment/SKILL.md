@@ -1104,14 +1104,26 @@ Do NOT retry a blocked URL or conclude the platform has no data until you've tri
 
 When WebFetch and platform APIs fail, use curl via the Bash tool with browser headers. This bypasses most bot detection by mimicking a real Chrome browser request. **Confirmed working on: LinkedIn, Reddit (old.reddit.com), Stack Overflow, and most platforms that serve server-rendered HTML.**
 
+**Why this works — the 3-layer bot detection model**: Sophisticated sites (including Sam's own) use layered detection. Every header below defeats a specific layer:
+- **Layer 1 — AI user-agent blocklist**: Blocks requests with `GPTBot`, `ClaudeBot`, `anthropic-ai`, etc. in the User-Agent. → The UA below mimics real Chrome.
+- **Layer 2 — `Accept: text/markdown` detection**: AI tools (including Claude Code's WebFetch) send `Accept: text/markdown` which no real browser ever does. → The Accept header below uses standard browser MIME types only. **Never add `text/markdown` to the Accept header.**
+- **Layer 3 — Non-browser heuristic**: If BOTH `Sec-Fetch-Mode` is absent AND `text/html` is not in Accept, the request is from a programmatic client. → The template includes both signals.
+
+**Do NOT remove or "simplify" these headers** — each one defeats a specific detection layer.
+
 ```bash
 curl -s -L \
-  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36' \
-  -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36' \
+  -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
   -H 'Accept-Language: en-US,en;q=0.9' \
+  -H 'Accept-Encoding: gzip, deflate, br' \
+  -H 'Connection: keep-alive' \
+  -H 'Upgrade-Insecure-Requests: 1' \
   -H 'Sec-Fetch-Mode: navigate' \
   -H 'Sec-Fetch-Site: none' \
   -H 'Sec-Fetch-Dest: document' \
+  -H 'Sec-Fetch-User: ?1' \
+  -H 'Priority: u=0, i' \
   'URL_HERE'
 ```
 
