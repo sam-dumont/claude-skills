@@ -66,26 +66,6 @@
       ]
     },
     {
-      "name": "candidate-assessment",
-      "source": "./plugins/candidate-assessment",
-      "description": "Deep professional assessment combining CV analysis, OSINT research, mentality profiling, and targeted interview question generation. Supports self-assessment and evaluating others with appropriate ethical boundaries.",
-      "version": "1.5.0",
-      "author": {
-        "name": "Sam Dumont"
-      },
-      "keywords": [
-        "candidate-assessment",
-        "hiring",
-        "interview",
-        "osint",
-        "cv-review",
-        "resume",
-        "profiling",
-        "recruitment",
-        "self-assessment"
-      ]
-    },
-    {
       "name": "technical-blog-post",
       "source": "./plugins/technical-blog-post",
       "description": "Process skill for turning raw project data into structured technical blog posts. Covers gathering, extraction, structure, and Astro frontmatter.",

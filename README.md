@@ -9,7 +9,6 @@ A marketplace collection of custom [Claude Code](https://docs.anthropic.com/en/d
 | **sams-voice** | Apply Sam Dumont's personal writing voice and style when drafting any written content. Works in English and French. | writing, style, voice, communication |
 | **sams-architecture** | Codifies Sam's mature architectural patterns for Python APIs, infrastructure/DevOps, Garmin/embedded systems, and frontend projects. Enforces Service→Repository→Database pattern, 80% test coverage, comprehensive CI/CD, and zero-tolerance security standards. | architecture, python, devops, embedded, security, testing |
 | **outcome-engineering** | Reframes tasks as measurable outcomes using o16g principles. Adds outcome specification, execution guardrails, and validation to any workflow. | outcome-engineering, o16g, outcomes, verification |
-| **candidate-assessment** | Deep professional assessment combining CV analysis, OSINT research, mentality profiling, and targeted interview question generation. Supports self-assessment and evaluating others with appropriate ethical boundaries. | hiring, interview, osint, cv-review, recruitment |
 | **technical-blog-post** | Process skill for turning raw project data (research notes, session logs, drafts, code) into structured technical blog posts. Covers gathering, extraction, structure, and Astro frontmatter. | blog, writing, technical-writing, blog-post, astro, content |
 
 ## Installation
@@ -24,7 +23,6 @@ Install skills directly from this GitHub repository using Claude Code's marketpl
 /plugin install sams-voice@sams-skills
 /plugin install sams-architecture@sams-skills
 /plugin install outcome-engineering@sams-skills
-/plugin install candidate-assessment@sams-skills
 /plugin install technical-blog-post@sams-skills
 ```
 
@@ -65,7 +63,6 @@ Add to your project's `.claude/settings.json`:
     "sams-voice@sams-skills": true,
     "sams-architecture@sams-skills": true,
     "outcome-engineering@sams-skills": true,
-    "candidate-assessment@sams-skills": true,
     "technical-blog-post@sams-skills": true
   }
 }
@@ -126,27 +123,6 @@ Based on the [o16g manifesto](https://o16g.com/):
 - Identify risk gates early
 - When uncertain, form hypotheses and test cheaply
 
-### candidate-assessment
-
-Automatically triggered when:
-- Evaluating a candidate for hiring
-- Reviewing a CV or resume
-- Preparing interview questions
-- Doing a self-assessment of your own profile
-- Researching someone's professional background
-
-Two operating modes:
-- **Self-Assessment**: Full profile analysis including pseudonym linking (with identity verification), CV improvement suggestions
-- **Evaluating Others**: Ethical boundaries enforced — no pseudonym linking, no CV suggestions, professional assessment only
-
-Delivers:
-- Structured profile extraction (CV or name-only input)
-- 4-agent parallel deep research (digital footprint, claim verification, company context, reputation signals)
-- 8-dimension mentality profile
-- Technical depth assessment with evidence levels
-- Churn risk matrix
-- 10-15 targeted interview questions specific to the candidate
-
 ### technical-blog-post
 
 Automatically triggered when:
@@ -186,12 +162,6 @@ claude-skills/
 │   │   │   └── plugin.json
 │   │   └── skills/
 │   │       └── outcome-engineering/
-│   │           └── SKILL.md
-│   ├── candidate-assessment/
-│   │   ├── .claude-plugin/
-│   │   │   └── plugin.json
-│   │   └── skills/
-│   │       └── candidate-assessment/
 │   │           └── SKILL.md
 │   └── technical-blog-post/
 │       ├── .claude-plugin/
