@@ -10,6 +10,7 @@ A marketplace collection of custom [Claude Code](https://docs.anthropic.com/en/d
 | **sams-architecture** | Codifies Sam's mature architectural patterns for Python APIs, infrastructure/DevOps, Garmin/embedded systems, and frontend projects. Enforces Service→Repository→Database pattern, 80% test coverage, comprehensive CI/CD, and zero-tolerance security standards. | architecture, python, devops, embedded, security, testing |
 | **outcome-engineering** | Reframes tasks as measurable outcomes using o16g principles. Adds outcome specification, execution guardrails, and validation to any workflow. | outcome-engineering, o16g, outcomes, verification |
 | **technical-blog-post** | Process skill for turning raw project data (research notes, session logs, drafts, code) into structured technical blog posts. Covers gathering, extraction, structure, and Astro frontmatter. | blog, writing, technical-writing, blog-post, astro, content |
+| **sketch-checker** | Research whether a metal band has ties to far-right, NSBM, or fascist movements. Uses parallel research agents with tiered verdicts for both historical and current status. | metal, nsbm, black-metal, sketch, antifascist, rabm, music, research |
 
 ## Installation
 
@@ -24,6 +25,7 @@ Install skills directly from this GitHub repository using Claude Code's marketpl
 /plugin install sams-architecture@sams-skills
 /plugin install outcome-engineering@sams-skills
 /plugin install technical-blog-post@sams-skills
+/plugin install sketch-checker@sams-skills
 ```
 
 **That's it!** Skills are now available and auto-trigger when Claude detects matching prompts.
@@ -63,7 +65,8 @@ Add to your project's `.claude/settings.json`:
     "sams-voice@sams-skills": true,
     "sams-architecture@sams-skills": true,
     "outcome-engineering@sams-skills": true,
-    "technical-blog-post@sams-skills": true
+    "technical-blog-post@sams-skills": true,
+    "sketch-checker@sams-skills": true
   }
 }
 ```
@@ -137,6 +140,21 @@ Process workflow:
 - **Phase 4: Voice Check** — Verify against `sams-voice` standards (no LLM-isms, real numbers, varied structure)
 - **Phase 5: Astro Frontmatter** — Correct metadata with back-publishing support
 
+### sketch-checker
+
+Automatically triggered when:
+- Asking "is [band] sketch?" or "is [band] safe?"
+- Vetting a metal band for fascist, NSBM, or far-right connections
+- Requesting a sketch report or RABM check
+- Asking about red flags for a specific band
+
+Research methodology:
+- **Phase 1: Core Sources** — 3 parallel agents search community databases (r/rabm, r/IsItSketch, Hellseatic, sketchycon.blog), Metal Archives/Bandcamp/Discogs (members, side projects, labels), and press/interviews (eclipshead.com, festivals, social media)
+- **Phase 2: Targeted Deep Dive** — 1-3 follow-up agents chase leads from Phase 1 (member side projects, label networks, claim verification)
+- **Phase 3: Synthesis & Report** — Dual-axis verdict (Historical Tier + Current Status) using 5 tiers: Safe / Mild Sketch / Moderate Sketch / Major Sketch / Nazi
+
+Reports saved to `sketch-reports/{band-name}.md` with full sourcing.
+
 ## Repository Structure
 
 ```
@@ -163,11 +181,17 @@ claude-skills/
 │   │   └── skills/
 │   │       └── outcome-engineering/
 │   │           └── SKILL.md
-│   └── technical-blog-post/
+│   ├── technical-blog-post/
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   └── skills/
+│   │       └── technical-blog-post/
+│   │           └── SKILL.md
+│   └── sketch-checker/
 │       ├── .claude-plugin/
 │       │   └── plugin.json
 │       └── skills/
-│           └── technical-blog-post/
+│           └── sketch-checker/
 │               └── SKILL.md
 ├── CLAUDE.md                     # Project instructions & maintenance checklist
 └── README.md

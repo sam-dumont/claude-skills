@@ -1,0 +1,22 @@
+{
+  "name": "sketch-checker",
+  "version": "1.0.0",
+  "description": "Research whether a metal band has ties to far-right, NSBM, or fascist movements. Uses parallel research agents with tiered verdicts for both historical and current status.",
+  "author": {
+    "name": "Sam Dumont",
+    "email": "sam@dropbars.be"
+  },
+  "homepage": "https://github.com/sam-dumont/claude-skills",
+  "repository": "https://github.com/sam-dumont/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "metal",
+    "nsbm",
+    "black-metal",
+    "sketch",
+    "antifascist",
+    "rabm",
+    "music",
+    "research"
+  ]
+}
