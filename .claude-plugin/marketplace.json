@@ -81,6 +81,25 @@
         "astro",
         "content"
       ]
+    },
+    {
+      "name": "sketch-checker",
+      "source": "./plugins/sketch-checker",
+      "description": "Research whether a metal band has ties to far-right, NSBM, or fascist movements. Uses parallel research agents with tiered verdicts for both historical and current status.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Sam Dumont"
+      },
+      "keywords": [
+        "metal",
+        "nsbm",
+        "black-metal",
+        "sketch",
+        "antifascist",
+        "rabm",
+        "music",
+        "research"
+      ]
     }
   ]
 }

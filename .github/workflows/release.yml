@@ -87,6 +87,7 @@ jobs:
             - **sams-architecture**: Architectural patterns (Python/DevOps/Embedded)
             - **outcome-engineering**: Outcome-first workflow framing (o16g)
             - **technical-blog-post**: Technical blog post writing from raw project data
+            - **sketch-checker**: Metal band fascist ties research (NSBM/far-right vetting)
 
             ### Installation
 
@@ -99,6 +100,7 @@ jobs:
             /plugin install sams-architecture@sams-skills
             /plugin install outcome-engineering@sams-skills
             /plugin install technical-blog-post@sams-skills
+            /plugin install sketch-checker@sams-skills
             ```
 
             ### What's Changed

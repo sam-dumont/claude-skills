@@ -27,6 +27,7 @@ Optional: a `templates/` directory for supporting materials (see sams-voice for 
 | sams-architecture | Architectural patterns (Python/DevOps/Embedded/Frontend) |
 | outcome-engineering | Outcome-first workflow framing (o16g) |
 | technical-blog-post | Technical blog post writing from raw project data |
+| sketch-checker | Metal band fascist/NSBM ties research with parallel agent methodology |
 
 ## Mandatory Checklist: Adding or Modifying a Skill
 
