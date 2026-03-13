@@ -1,0 +1,24 @@
+{
+  "name": "code-security",
+  "version": "1.0.0",
+  "description": "Comprehensive Python code security skill combining static analysis tools (Bandit, pip-audit, safety) with LLM-powered dynamic analysis. Claude actively reviews code for injection vulnerabilities, path traversal, insecure deserialization, secrets exposure, auth bypasses, and logic flaws that static tools miss.",
+  "author": {
+    "name": "Sam Dumont",
+    "email": "sam@dropbars.be"
+  },
+  "homepage": "https://github.com/sam-dumont/claude-skills",
+  "repository": "https://github.com/sam-dumont/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "python",
+    "bandit",
+    "pip-audit",
+    "vulnerability",
+    "sast",
+    "code-review",
+    "owasp",
+    "injection",
+    "secrets-detection"
+  ]
+}

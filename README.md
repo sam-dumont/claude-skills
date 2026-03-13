@@ -11,6 +11,8 @@ A marketplace collection of custom [Claude Code](https://docs.anthropic.com/en/d
 | **outcome-engineering** | Reframes tasks as measurable outcomes using o16g principles. Adds outcome specification, execution guardrails, and validation to any workflow. | outcome-engineering, o16g, outcomes, verification |
 | **technical-blog-post** | Process skill for turning raw project data (research notes, session logs, drafts, code) into structured technical blog posts. Covers gathering, extraction, structure, and Astro frontmatter. | blog, writing, technical-writing, blog-post, astro, content |
 | **sketch-checker** | Research whether a metal band has ties to far-right, NSBM, or fascist movements. Uses parallel research agents with tiered verdicts for both historical and current status. | metal, nsbm, black-metal, sketch, antifascist, rabm, music, research |
+| **code-quality** | Comprehensive Python code quality skill. Sets up and runs ruff, mypy, xenon, vulture, file-length gates, and pre-commit hooks. Full Makefile-based workflow using uv. | code-quality, python, linting, ruff, mypy, formatting, complexity |
+| **code-security** | Python code security combining static analysis (Bandit, pip-audit) with LLM-powered dynamic analysis for injection, path traversal, auth bypasses, and logic flaws. | security, python, bandit, pip-audit, owasp, sast, vulnerability |
 
 ## Installation
 
@@ -26,6 +28,8 @@ Install skills directly from this GitHub repository using Claude Code's marketpl
 /plugin install outcome-engineering@sams-skills
 /plugin install technical-blog-post@sams-skills
 /plugin install sketch-checker@sams-skills
+/plugin install code-quality@sams-skills
+/plugin install code-security@sams-skills
 ```
 
 **That's it!** Skills are now available and auto-trigger when Claude detects matching prompts.
@@ -66,7 +70,9 @@ Add to your project's `.claude/settings.json`:
     "sams-architecture@sams-skills": true,
     "outcome-engineering@sams-skills": true,
     "technical-blog-post@sams-skills": true,
-    "sketch-checker@sams-skills": true
+    "sketch-checker@sams-skills": true,
+    "code-quality@sams-skills": true,
+    "code-security@sams-skills": true
   }
 }
 ```
@@ -155,6 +161,40 @@ Research methodology:
 
 Reports saved to `sketch-reports/{band-name}.md` with full sourcing.
 
+### code-quality
+
+Automatically triggered when:
+- Setting up Python linting, formatting, or type checking
+- Configuring ruff, mypy, or pre-commit hooks
+- Running code quality checks or quality gates
+- Auditing code for complexity, dead code, or file length
+- Asking "check my code quality" or "set up linting"
+
+Tool stack:
+- **ruff**: Linting + formatting (replaces flake8, isort, black) — 10-100x faster
+- **mypy**: Static type checking with strict defaults
+- **xenon**: Cyclomatic complexity gating (grade C)
+- **vulture**: Dead code detection (90% confidence)
+- **pre-commit**: Git hook automation for ruff + mypy
+- **Makefile**: All checks as make targets using `uv run` / `uvx`
+
+Provides complete `pyproject.toml` configuration, Makefile targets, and `.pre-commit-config.yaml`.
+
+### code-security
+
+Automatically triggered when:
+- Running security scans or auditing code for vulnerabilities
+- Checking dependencies for CVEs
+- Reviewing code for OWASP top 10 issues
+- Asking "is this code secure?" or "find vulnerabilities"
+- Setting up a security pipeline
+
+Two-layer approach:
+- **Layer 1 — Static Analysis**: Bandit (SAST), pip-audit (dependency CVEs), detect-secrets (credentials), ruff S-rules
+- **Layer 2 — LLM Dynamic Analysis**: Claude actively reasons about auth bypasses, path traversal, injection vectors, race conditions, IDOR, insecure deserialization, and logic flaws that no static tool can detect
+
+Includes Makefile targets, CI integration examples, vulnerability pattern reference, and a security hardening checklist.
+
 ## Repository Structure
 
 ```
@@ -187,11 +227,23 @@ claude-skills/
 │   │   └── skills/
 │   │       └── technical-blog-post/
 │   │           └── SKILL.md
-│   └── sketch-checker/
+│   ├── sketch-checker/
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   └── skills/
+│   │       └── sketch-checker/
+│   │           └── SKILL.md
+│   ├── code-quality/
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   └── skills/
+│   │       └── code-quality/
+│   │           └── SKILL.md
+│   └── code-security/
 │       ├── .claude-plugin/
 │       │   └── plugin.json
 │       └── skills/
-│           └── sketch-checker/
+│           └── code-security/
 │               └── SKILL.md
 ├── CLAUDE.md                     # Project instructions & maintenance checklist
 └── README.md

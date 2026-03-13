@@ -28,6 +28,8 @@ Optional: a `templates/` directory for supporting materials (see sams-voice for 
 | outcome-engineering | Outcome-first workflow framing (o16g) |
 | technical-blog-post | Technical blog post writing from raw project data |
 | sketch-checker | Metal band fascist/NSBM ties research with parallel agent methodology |
+| code-quality | Python code quality setup & checks (ruff, mypy, xenon, vulture, pre-commit) |
+| code-security | Python security scanning — static tools (Bandit, pip-audit) + LLM-powered dynamic analysis |
 
 ## Mandatory Checklist: Adding or Modifying a Skill
 

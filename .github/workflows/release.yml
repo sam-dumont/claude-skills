@@ -88,6 +88,8 @@ jobs:
             - **outcome-engineering**: Outcome-first workflow framing (o16g)
             - **technical-blog-post**: Technical blog post writing from raw project data
             - **sketch-checker**: Metal band fascist ties research (NSBM/far-right vetting)
+            - **code-quality**: Python code quality (ruff, mypy, complexity, dead code, pre-commit)
+            - **code-security**: Python security scanning (Bandit, pip-audit, LLM-powered analysis)
 
             ### Installation
 
@@ -101,6 +103,8 @@ jobs:
             /plugin install outcome-engineering@sams-skills
             /plugin install technical-blog-post@sams-skills
             /plugin install sketch-checker@sams-skills
+            /plugin install code-quality@sams-skills
+            /plugin install code-security@sams-skills
             ```
 
             ### What's Changed
