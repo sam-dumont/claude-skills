@@ -1,0 +1,24 @@
+{
+  "name": "code-quality",
+  "version": "1.0.0",
+  "description": "Comprehensive Python code quality skill. Sets up and runs ruff (lint + format), mypy (type checking), xenon (cyclomatic complexity), vulture (dead code), file-length gates, and pre-commit hooks. Provides a full Makefile-based workflow using uv for fast package management.",
+  "author": {
+    "name": "Sam Dumont",
+    "email": "sam@dropbars.be"
+  },
+  "homepage": "https://github.com/sam-dumont/claude-skills",
+  "repository": "https://github.com/sam-dumont/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "code-quality",
+    "python",
+    "linting",
+    "ruff",
+    "mypy",
+    "formatting",
+    "complexity",
+    "dead-code",
+    "pre-commit",
+    "uv"
+  ]
+}

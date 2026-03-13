@@ -100,6 +100,48 @@
         "music",
         "research"
       ]
+    },
+    {
+      "name": "code-quality",
+      "source": "./plugins/code-quality",
+      "description": "Comprehensive Python code quality skill. Sets up and runs ruff (lint + format), mypy (type checking), xenon (cyclomatic complexity), vulture (dead code), file-length gates, and pre-commit hooks. Provides a full Makefile-based workflow using uv for fast package management.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Sam Dumont"
+      },
+      "keywords": [
+        "code-quality",
+        "python",
+        "linting",
+        "ruff",
+        "mypy",
+        "formatting",
+        "complexity",
+        "dead-code",
+        "pre-commit",
+        "uv"
+      ]
+    },
+    {
+      "name": "code-security",
+      "source": "./plugins/code-security",
+      "description": "Comprehensive Python code security skill combining static analysis tools (Bandit, pip-audit, safety) with LLM-powered dynamic analysis. Claude actively reviews code for injection vulnerabilities, path traversal, insecure deserialization, secrets exposure, auth bypasses, and logic flaws that static tools miss.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Sam Dumont"
+      },
+      "keywords": [
+        "security",
+        "python",
+        "bandit",
+        "pip-audit",
+        "vulnerability",
+        "sast",
+        "code-review",
+        "owasp",
+        "injection",
+        "secrets-detection"
+      ]
     }
   ]
 }
