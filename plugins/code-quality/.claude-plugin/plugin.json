@@ -1,6 +1,6 @@
 {
   "name": "code-quality",
-  "version": "1.0.0",
+  "version": "1.7.0",
   "description": "Comprehensive Python code quality skill. Sets up and runs ruff (lint + format), mypy (type checking), xenon (cyclomatic complexity), vulture (dead code), file-length gates, and pre-commit hooks. Provides a full Makefile-based workflow using uv for fast package management.",
   "author": {
     "name": "Sam Dumont",

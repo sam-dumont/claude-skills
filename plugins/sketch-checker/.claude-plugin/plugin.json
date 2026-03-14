@@ -1,6 +1,6 @@
 {
   "name": "sketch-checker",
-  "version": "1.0.0",
+  "version": "1.7.0",
   "description": "Research whether a metal band has ties to far-right, NSBM, or fascist movements. Uses parallel research agents with tiered verdicts for both historical and current status.",
   "author": {
     "name": "Sam Dumont",

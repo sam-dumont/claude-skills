@@ -1,6 +1,6 @@
 {
   "name": "code-security",
-  "version": "1.0.0",
+  "version": "1.7.0",
   "description": "Comprehensive Python code security skill combining static analysis tools (Bandit, pip-audit, safety) with LLM-powered dynamic analysis. Claude actively reviews code for injection vulnerabilities, path traversal, insecure deserialization, secrets exposure, auth bypasses, and logic flaws that static tools miss.",
   "author": {
     "name": "Sam Dumont",
