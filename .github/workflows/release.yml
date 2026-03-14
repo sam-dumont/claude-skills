@@ -89,6 +89,7 @@ jobs:
             - **technical-blog-post**: Technical blog post writing from raw project data
             - **sketch-checker**: Metal band fascist ties research (NSBM/far-right vetting)
             - **code-quality**: Python code quality (ruff, mypy, complexity, dead code, pre-commit)
+            - **advanced-code-quality**: Advanced Python quality gates (cognitive complexity, duplication, architecture, dependency hygiene, AI code detection)
             - **code-security**: Python security scanning (Bandit, pip-audit, LLM-powered analysis)
 
             ### Installation
@@ -104,6 +105,7 @@ jobs:
             /plugin install technical-blog-post@sams-skills
             /plugin install sketch-checker@sams-skills
             /plugin install code-quality@sams-skills
+            /plugin install advanced-code-quality@sams-skills
             /plugin install code-security@sams-skills
             ```
 

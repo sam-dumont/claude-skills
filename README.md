@@ -12,6 +12,7 @@ A marketplace collection of custom [Claude Code](https://docs.anthropic.com/en/d
 | **technical-blog-post** | Process skill for turning raw project data (research notes, session logs, drafts, code) into structured technical blog posts. Covers gathering, extraction, structure, and Astro frontmatter. | blog, writing, technical-writing, blog-post, astro, content |
 | **sketch-checker** | Research whether a metal band has ties to far-right, NSBM, or fascist movements. Uses parallel research agents with tiered verdicts for both historical and current status. | metal, nsbm, black-metal, sketch, antifascist, rabm, music, research |
 | **code-quality** | Comprehensive Python code quality skill. Sets up and runs ruff, mypy, xenon, vulture, file-length gates, and pre-commit hooks. Full Makefile-based workflow using uv. | code-quality, python, linting, ruff, mypy, formatting, complexity |
+| **advanced-code-quality** | Advanced Python quality gates beyond basic linting. Covers cognitive complexity (complexipy), code duplication (jscpd), architectural enforcement (import-linter), dependency hygiene (deptry), test quality gates (diff-cover, mutmut), docstring coverage (interrogate), and AI code detection (sloppylint). | advanced-code-quality, complexipy, jscpd, import-linter, deptry, diff-cover, mutation-testing, interrogate, sloppylint |
 | **code-security** | Python code security combining static analysis (Bandit, pip-audit) with LLM-powered dynamic analysis for injection, path traversal, auth bypasses, and logic flaws. | security, python, bandit, pip-audit, owasp, sast, vulnerability |
 
 ## Installation
@@ -29,6 +30,7 @@ Install skills directly from this GitHub repository using Claude Code's marketpl
 /plugin install technical-blog-post@sams-skills
 /plugin install sketch-checker@sams-skills
 /plugin install code-quality@sams-skills
+/plugin install advanced-code-quality@sams-skills
 /plugin install code-security@sams-skills
 ```
 
@@ -72,6 +74,7 @@ Add to your project's `.claude/settings.json`:
     "technical-blog-post@sams-skills": true,
     "sketch-checker@sams-skills": true,
     "code-quality@sams-skills": true,
+    "advanced-code-quality@sams-skills": true,
     "code-security@sams-skills": true
   }
 }
@@ -180,6 +183,26 @@ Tool stack:
 
 Provides complete `pyproject.toml` configuration, Makefile targets, and `.pre-commit-config.yaml`.
 
+### advanced-code-quality
+
+Automatically triggered when:
+- Going beyond basic linting to enforce advanced quality gates
+- Setting up cognitive complexity checks, duplication detection, or architectural enforcement
+- Configuring complexipy, jscpd, import-linter, deptry, interrogate, or sloppylint
+- Adding mutation testing, diff coverage, or dependency hygiene checks
+- Asking "bulletproof Python", "tighten quality gates", or "catch AI-generated code issues"
+
+Complements the code-quality skill (ruff, mypy, xenon, vulture) with 20+ additional tools:
+- **Cognitive complexity**: complexipy (threshold ≤10), wily (trend tracking), radon MI
+- **Code duplication**: jscpd (≤5%), pylint R0801
+- **Architectural enforcement**: import-linter (layer/independence/forbidden contracts), pytestarch
+- **Dependency hygiene**: deptry (DEP001–DEP005), pipdeptree
+- **Test quality**: diff-cover (≥95% on changed lines), mutmut (≥75% mutation score), pytest-benchmark
+- **Documentation**: interrogate (≥95% docstring coverage), griffe (API breaking changes)
+- **AI code detection**: sloppylint (hallucinated imports), tightened thresholds for AI-heavy codebases
+
+Includes complete pre-commit config (staged by speed), CI pipeline with parallel jobs and quality gate, and pyproject.toml configuration for all tools.
+
 ### code-security
 
 Automatically triggered when:
@@ -238,6 +261,12 @@ claude-skills/
 │   │   │   └── plugin.json
 │   │   └── skills/
 │   │       └── code-quality/
+│   │           └── SKILL.md
+│   ├── advanced-code-quality/
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   └── skills/
+│   │       └── advanced-code-quality/
 │   │           └── SKILL.md
 │   └── code-security/
 │       ├── .claude-plugin/

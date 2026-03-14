@@ -29,6 +29,7 @@ Optional: a `templates/` directory for supporting materials (see sams-voice for 
 | technical-blog-post | Technical blog post writing from raw project data |
 | sketch-checker | Metal band fascist/NSBM ties research with parallel agent methodology |
 | code-quality | Python code quality setup & checks (ruff, mypy, xenon, vulture, pre-commit) |
+| advanced-code-quality | Advanced Python quality gates (cognitive complexity, duplication, architecture, dependency hygiene, AI code detection) |
 | code-security | Python security scanning — static tools (Bandit, pip-audit) + LLM-powered dynamic analysis |
 
 ## Mandatory Checklist: Adding or Modifying a Skill
