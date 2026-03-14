@@ -120,16 +120,56 @@ For Sam's blog specifically (`site/src/content/blog/`):
 
 ```yaml
 ---
-title: string        # Lowercase after first word unless proper noun
-pubDate: YYYY-MM-DD  # The actual project completion date, not publication date
-description: string  # 1 sentence, specific, includes key tech
-tags: string[]       # Lowercase, specific (not "technology" but "python")
-draft: boolean       # false when ready
-image: string        # Optional, path to hero image
+title: string              # Lowercase after first word unless proper noun
+pubDate: YYYY-MM-DD        # The actual project completion date, not publication date
+description: string        # 1 sentence, specific, includes key tech
+tags: string[]             # Lowercase, specific (not "technology" but "python")
+draft: boolean             # false when ready
+image: string              # Optional, path to hero image
+heroImage: string          # Optional, path to AI-generated hero (e.g. "/heroes/my-post.jpg")
+heroImagePrompt: string    # Optional, the prompt used to generate heroImage (shown on page)
 ---
 ```
 
 **Back-publishing:** When writing about past projects, set `pubDate` to the project date. The blog should read as a timeline of work, not a dump of posts all dated today.
+
+### Phase 6: OG Hero Image Prompt
+
+Generate an image generation prompt (for Gemini/Imagen) to create a hero image for the post's Open Graph social preview. The image will be used as a background in a 1200×630 OG card with a dark overlay and text on top.
+
+**Prompt template:**
+
+> A dark moody digital illustration of [SCENE SPECIFIC TO THE POST'S CORE CONCEPT]. [KEY VISUAL ELEMENT 1] and [KEY VISUAL ELEMENT 2]. Color palette: deep navy (#101218), electric blue (#468CDC) accents, [ONE ADDITIONAL ACCENT COLOR RELEVANT TO THE TOPIC]. Technical illustration style, slightly stylized, 16:9 landscape, dark background suitable for text overlay.
+
+**Rules for good prompts:**
+
+| Rule | Why |
+|------|-----|
+| Anchor to the post's central metaphor | A post about binary reverse-engineering → hex dumps flowing over a race car, not a generic "code on screen" |
+| Always specify dark background (#101218) | The OG template uses dark theme colors; a bright image won't blend |
+| Include the accent blue (#468CDC) | Maintains brand consistency across all cards |
+| Add one topic-specific accent color | Warm amber for legacy systems, orange for racing/speed, green for git |
+| Say "suitable for text overlay" | Prevents the generator from filling the entire frame with detail |
+| Keep it 16:9 landscape | Matches the 1200×630 OG dimensions |
+| "Technical illustration, slightly stylized" | Avoids photorealism (uncanny) and pure cartoon (unprofessional) |
+| Reference concrete objects from the post | Not "technology concept" but "weathered terminal connected to modern API" |
+
+**Output format:** Include the prompt in a fenced block at the end of the blog post draft, tagged for easy extraction:
+
+```
+<!-- og-hero-prompt
+[The full image generation prompt here]
+-->
+```
+
+The author generates the image externally (Gemini, DALL-E, etc.), saves it as `site/public/heroes/{slug}.jpg`, and adds both fields to the frontmatter:
+
+```yaml
+heroImage: /heroes/my-post-slug.jpg
+heroImagePrompt: "The full prompt used to generate this image"
+```
+
+The blog template displays the hero image above the article content with a collapsible "AI-generated image — show prompt" caption that reveals the `heroImagePrompt` text. This is intentional transparency about AI-generated visuals.
 
 ## Common Mistakes
 
