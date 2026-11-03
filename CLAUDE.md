@@ -93,3 +93,9 @@ Update the description/keywords in ALL places where they appear:
 - Do NOT manually edit versions — let the release pipeline handle it
 - Do NOT commit secrets or private templates (check .gitignore)
 - Do NOT create skills with overlapping trigger patterns that would conflict with existing skills
+
+## Project notes
+
+If a `notes` MCP server is connected, read its index and this project's page before starting
+(status, where the last session stopped, settled decisions), and record what you decide there
+before you finish. This file wins where they differ.
